@@ -41,10 +41,9 @@ public class TransactionController {
 	public TransactionBoundary[] getTransactionsByUserIdAndTypeAndCategoryAndDateAfter(@PathVariable("userId") String userId,
 			@PathVariable("categoryId") List<String> categoryId,@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  String date) {
 		System.out.println("---------------------------> "+ date);
-		return transactionService.getTransactionsByUserIdAndByTypeAndByCategoryAndDateAfter(userId, categoryId,date)
+		return transactionService.getTransactionsByUserIdAndAndCategoryAndDateAfter(userId, categoryId,date)
 				.toArray(new TransactionBoundary[0]);
 	}
-	
 	
 	@RequestMapping(path = "/transaction/{transactionId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public TransactionBoundary getSpecificTransaction(@PathVariable("transactionId") String transactionId) {
@@ -54,13 +53,6 @@ public class TransactionController {
 	@RequestMapping(path = "/transaction/{transactionId}", method = RequestMethod.DELETE)
 	public void deleteTransaction(@PathVariable("transactionId") String transactionId) {
 		transactionService.deleteTransaction(transactionId);
-	}
-
-	@RequestMapping(path = "/transaction/type/{userId}/{transactionType}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public TransactionBoundary[] getAllUserTransactionsByType(@PathVariable("userId") String userId,
-			@PathVariable("transactionType") String transactionType) {
-		return transactionService.getAllUserTransactionsByType(userId, transactionType)
-				.toArray(new TransactionBoundary[0]);
 	}
 
 	@RequestMapping(path = "/transaction/category/{userId}/{categoryId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

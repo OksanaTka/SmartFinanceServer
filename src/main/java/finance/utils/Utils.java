@@ -4,8 +4,6 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import finance.data.TransactionType;
-
 @Service
 public class Utils {
 
@@ -40,13 +38,4 @@ public class Utils {
 	public String toLowerCaseEmail(String email) {
 		return email.toLowerCase();
 	}
-	
-	public void assertValidTransactionType(String type) {
-		for (TransactionType tt : TransactionType.values()) {
-			if (tt.name().equals(type))
-				return;
-		}
-		throw new BadRequestException("Invalid type");
-	}
-
 }

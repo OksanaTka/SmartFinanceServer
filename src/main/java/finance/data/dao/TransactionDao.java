@@ -14,17 +14,15 @@ public interface TransactionDao extends PagingAndSortingRepository<TransactionEn
 
 	public List<TransactionEntity> findAllByUserId(@Param("userId") String userId);
 
-	// Get all expense/income of the user
-	public List<TransactionEntity> findAllByUserIdAndTransactionType(@Param("userId") String userId,
-			@Param("transactionType") String transactionType);
-
 	// Get all expense/income of the user by categories id
-	public List<TransactionEntity> findAllByUserIdAndCategoryIdInAndDateAfter(@Param("userId") String userId,
-			 @Param("categoryId") List<String> categoryId,@Param("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String date);
+	public List<TransactionEntity> findAllByUserIdAndCategoryIdInAndDateAfterOrderByDate(
+			@Param("userId") String userId,
+			 @Param("categoryId") List<String> categoryId,
+			 @Param("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String date);
 
 	// Get all transactions of the user by category - Food/Clothes
 	public List<TransactionEntity> findAllByUserIdAndCategoryId(@Param("userId") String userId,
-			@Param("categoryId") String transactionType);
+			@Param("categoryId") String categoryId);
 
 	// Get all transactions of the user by date
 	public List<TransactionEntity> findAllByUserIdAndDate(@Param("userId") String userId, @Param("date") String date);

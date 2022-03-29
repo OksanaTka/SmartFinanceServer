@@ -1,5 +1,6 @@
 package finance.logic.jpa;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,19 +73,6 @@ public class TransactionJpa implements TransactionService {
 		}
 	}
 
-//	
-//	@Override
-//	public TransactionBoundary getTransactionsByUserId(String userId) {
-//		utils.assertNull(userId);
-//		
-//
-//		List<TransactionEntity> transactions = this.transactionDao.findAllByUserId(userId);
-//		if (!transactions.isEmpty()) {
-//			return entityConverter.toBoundary(transactions.get(0));
-//		} else {
-//			throw new NotFoundException("Could not find transaction by user: " + userId);
-//		}
-//	}
 	@Override
 	public List<TransactionBoundary> getTransactionsByUserId(String userId) {
 		utils.assertNull(userId);
@@ -114,24 +102,6 @@ public class TransactionJpa implements TransactionService {
 	}
 
 	@Override
-	public List<TransactionBoundary> getAllUserTransactionsByType(String userId, String transactionType) {
-		utils.assertNull(userId);
-		utils.assertNull(transactionType);
-		utils.assertValidTransactionType(transactionType);
-
-		// TODO: Check if the user exists
-
-		// Get the transactions by type - expense/income
-		List<TransactionEntity> transactions = this.transactionDao.findAllByUserIdAndTransactionType(userId,
-				transactionType);
-		if (!transactions.isEmpty()) {
-			return transactions.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
-		} else {
-			throw new NotFoundException("Could not find transactions for user: " + userId);
-		}
-	}
-
-	@Override
 	public List<TransactionBoundary> getAllUserTransactionsByCategory(String userId, String categoryId) {
 		utils.assertNull(userId);
 		utils.assertNull(categoryId);
@@ -149,7 +119,7 @@ public class TransactionJpa implements TransactionService {
 	}
 
 	@Override
-	public List<TransactionBoundary> getTransactionsByUserIdAndByTypeAndByCategoryAndDateAfter(String userId,
+	public List<TransactionBoundary> getTransactionsByUserIdAndAndCategoryAndDateAfter(String userId,
 			List<String> categoryId,String date) {
 
 		utils.assertNull(userId);
@@ -157,7 +127,7 @@ public class TransactionJpa implements TransactionService {
 		utils.assertNull(date);
 
 		List<TransactionEntity> transactions = this.transactionDao
-				.findAllByUserIdAndCategoryIdInAndDateAfter(userId, categoryId,date);
+				.findAllByUserIdAndCategoryIdInAndDateAfterOrderByDate(userId, categoryId,date);
 		if (!transactions.isEmpty()) {
 			return transactions.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
 		} else {

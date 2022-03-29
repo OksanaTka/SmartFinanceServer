@@ -11,11 +11,9 @@ public interface TransactionService {
 
 	public List<TransactionBoundary> getTransactionsByUserId(String userId);
 
-	public List<TransactionBoundary> getTransactionsByUserIdAndByTypeAndByCategoryAndDateAfter(String userId, List<String> categoryId, String date);
+	public List<TransactionBoundary> getTransactionsByUserIdAndAndCategoryAndDateAfter(String userId, List<String> categoryId, String date);
 
 	public void deleteTransaction(String transactionId);
-
-	public List<TransactionBoundary> getAllUserTransactionsByType(String userId, String transactionType);
 
 	public List<TransactionBoundary> getAllUserTransactionsByCategory(String userId, String categoryId);
 }

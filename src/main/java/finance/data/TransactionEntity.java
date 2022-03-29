@@ -1,6 +1,5 @@
 package finance.data;
 
-import java.sql.Timestamp;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -23,7 +22,6 @@ public class TransactionEntity {
 	private String categoryId;
 	private String amount;
 	private String date;
-	private String transactionType;
 
 	public TransactionEntity() {
 		super();
@@ -75,14 +73,6 @@ public class TransactionEntity {
 
 	public void setDate(String date) {
 		this.date = date;
-	}
-
-	public String getTransactionType() {
-		return transactionType;
-	}
-
-	public void setTransactionType(String transactionType) {
-		this.transactionType = transactionType;
 	}
 
 }
