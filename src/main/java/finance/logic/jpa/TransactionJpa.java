@@ -119,7 +119,7 @@ public class TransactionJpa implements TransactionService {
 	}
 
 	@Override
-	public List<TransactionBoundary> getTransactionsByUserIdAndAndCategoryAndDateAfter(String userId,
+	public List<TransactionBoundary> getTransactionsByUserIdAndCategoryAndDateAfter(String userId,
 			List<String> categoryId,String date) {
 
 		utils.assertNull(userId);
@@ -133,6 +133,21 @@ public class TransactionJpa implements TransactionService {
 		} else {
 			throw new NotFoundException(
 					"Could not find transactions for user : " + userId + " and categories" + categoryId.toString());
+		}
+	}
+
+	@Override
+	public List<TransactionBoundary> getTransactionsByUserIdAndDateAfter(String userId, String date) {
+		utils.assertNull(userId);
+		utils.assertNull(date);
+
+		List<TransactionEntity> transactions = this.transactionDao
+				.findAllByUserIdAndDateAfterOrderByDate(userId ,date);
+		if (!transactions.isEmpty()) {
+			return transactions.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
+		} else {
+			throw new NotFoundException(
+					"Could not find transactions for user : " + userId + " and date" + date.toString());
 		}
 	}
 

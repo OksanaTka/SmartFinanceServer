@@ -38,10 +38,16 @@ public class TransactionController {
 	}
 
 	@RequestMapping(path = "/transaction/getAll/{userId}/{categoryId}/{date}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public TransactionBoundary[] getTransactionsByUserIdAndTypeAndCategoryAndDateAfter(@PathVariable("userId") String userId,
+	public TransactionBoundary[] getTransactionsByUserIdAndCategoryAndDateAfter(@PathVariable("userId") String userId,
 			@PathVariable("categoryId") List<String> categoryId,@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  String date) {
-		System.out.println("---------------------------> "+ date);
-		return transactionService.getTransactionsByUserIdAndAndCategoryAndDateAfter(userId, categoryId,date)
+		return transactionService.getTransactionsByUserIdAndCategoryAndDateAfter(userId, categoryId,date)
+				.toArray(new TransactionBoundary[0]);
+	}
+	
+	@RequestMapping(path = "/transaction/getAll/{userId}/{date}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public TransactionBoundary[] getTransactionsByUserIdAndDateAfter(@PathVariable("userId") String userId,
+			@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  String date) {
+		return transactionService.getTransactionsByUserIdAndDateAfter(userId,date)
 				.toArray(new TransactionBoundary[0]);
 	}
 	
