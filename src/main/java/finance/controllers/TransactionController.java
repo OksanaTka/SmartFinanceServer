@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import finance.boundaries.BankAccountBoundary;
 import finance.boundaries.TransactionBoundary;
 import finance.logic.TransactionService;
 
@@ -65,6 +66,12 @@ public class TransactionController {
 	public TransactionBoundary[] getAllUserTransactionsByCategory(@PathVariable("userId") String userId,
 			@PathVariable("categoryId") String categoryId) {
 		return transactionService.getAllUserTransactionsByCategory(userId, categoryId)
+				.toArray(new TransactionBoundary[0]);
+	}
+	
+	@RequestMapping(path = "/transaction/getAll/bankApi", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+	public TransactionBoundary[] getAllTransactionsFromBankApi(@RequestBody BankAccountBoundary bankAccountBoundary) {
+		return transactionService.getAllTransactionsFromBankApi(bankAccountBoundary)
 				.toArray(new TransactionBoundary[0]);
 	}
 

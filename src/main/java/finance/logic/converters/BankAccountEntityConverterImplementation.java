@@ -18,6 +18,8 @@ public class BankAccountEntityConverterImplementation implements EntityConverter
 		ib.setUserId(entity.getUserId());
 		ib.setAccountCode(entity.getAccountCode());
 		ib.setAccountPassword(entity.getAccountPassword());
+		ib.setBankAccountNumber(entity.getBankAccountNumber());
+		ib.setBankBranch(entity.getBankBranch());
 		return ib;
 	}
 
@@ -28,7 +30,8 @@ public class BankAccountEntityConverterImplementation implements EntityConverter
 		ie.setUserId(boundary.getUserId());
 		ie.setAccountCode(boundary.getAccountCode());
 		ie.setAccountPassword(boundary.getAccountPassword());
-		
+		ie.setBankAccountNumber(boundary.getBankAccountNumber());
+		ie.setBankBranch(boundary.getBankBranch());
 		return ie;
 	}
 

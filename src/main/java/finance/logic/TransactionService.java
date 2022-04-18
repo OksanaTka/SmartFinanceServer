@@ -2,6 +2,8 @@ package finance.logic;
 
 import java.util.List;
 
+import finance.boundaries.BankAccountBoundary;
+import finance.boundaries.BankTransactionsDetailsBoundary;
 import finance.boundaries.TransactionBoundary;
 
 public interface TransactionService {
@@ -19,4 +21,7 @@ public interface TransactionService {
 	public void deleteTransaction(String transactionId);
 
 	public List<TransactionBoundary> getAllUserTransactionsByCategory(String userId, String categoryId);
+	
+	public List<TransactionBoundary> getAllTransactionsFromBankApi(BankAccountBoundary bankAccountBoundary);
+
 }

@@ -9,22 +9,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import finance.boundaries.BankAccountBoundary;
+import finance.data.BankAccountDetailsEntity;
 import finance.data.BankAccountEntity;
 import finance.data.BankEntity;
 import finance.data.UserEntity;
 import finance.data.dao.BankAccountDao;
+import finance.data.dao.BankAccountDetailsDao;
 import finance.data.dao.BankDao;
 import finance.data.dao.UserDao;
 import finance.logic.BankAccountService;
 import finance.logic.converters.EntityConverter;
 import finance.utils.ConflictException;
 import finance.utils.NotFoundException;
+import finance.utils.UnauthorizedException;
 import finance.utils.UnsupportedExecption;
 import finance.utils.Utils;
 
 @Service
 public class BankAccountJpa implements BankAccountService {
 
+	private BankAccountDetailsDao bankAccountDetailsDao;
 	private BankAccountDao bankAccountDao;
 	private BankDao bankDao;
 	private UserDao userDao;
@@ -59,6 +63,11 @@ public class BankAccountJpa implements BankAccountService {
 		this.entityConverter = entityConverter;
 	}
 
+	@Autowired
+	public void setBankAccountDetailsDao(BankAccountDetailsDao bankAccountDetailsDao) {
+		this.bankAccountDetailsDao = bankAccountDetailsDao;
+	}
+
 	@Override
 	@Transactional
 	public BankAccountBoundary createBankAccount(BankAccountBoundary bankAccount) {
@@ -79,19 +88,25 @@ public class BankAccountJpa implements BankAccountService {
 		if (!bankAccounts.isEmpty()) {
 			for (Iterator<BankAccountEntity> iterator = bankAccounts.iterator(); iterator.hasNext();) {
 				BankAccountEntity bankAccountEntity = (BankAccountEntity) iterator.next();
-				if (bankAccountEntity.getAccountCode().equals(bankAccount.getAccountCode())) {
-					throw new ConflictException("Account already exists: " + bankAccount.getAccountCode());
+				if (bankAccountEntity.getBankAccountNumber().equals(bankAccount.getBankAccountNumber())) {
+					throw new ConflictException("Account already exists: " + bankAccount.getBankAccountNumber());
 				}
 			}
 		}
 
-		BankAccountEntity entity = this.entityConverter.fromBoundary(bankAccount);
-		entity.setBankId(bankAccount.getBankId());
-		entity.setUserId(bankAccount.getUserId());
-		entity.setAccountCode(bankAccount.getAccountCode());
-		entity.setAccountPassword(bankAccount.getAccountPassword());
-		entity = this.bankAccountDao.save(entity);
+		List<BankAccountDetailsEntity> bankAccountDetails = this.bankAccountDetailsDao
+				.findAllByBankIdAndAccountCodeAndAccountPassword(bankAccount.getBankId(), bankAccount.getAccountCode(),
+						bankAccount.getAccountPassword());
+		if (bankAccountDetails.isEmpty()) {
+			throw new UnauthorizedException("Acoount code or password is incorrect ");
+		}
 
+		BankAccountEntity entity = this.entityConverter.fromBoundary(bankAccount);
+	
+		entity.setBankBranch(bankAccountDetails.get(0).getBankBranch());
+		entity.setBankAccountNumber(bankAccountDetails.get(0).getBankAccountNumber());
+		entity = this.bankAccountDao.save(entity);
+		
 		return this.entityConverter.toBoundary(entity);
 	}
 
