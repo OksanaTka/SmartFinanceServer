@@ -22,6 +22,6 @@ public interface TransactionService {
 
 	public List<TransactionBoundary> getAllUserTransactionsByCategory(String userId, String categoryId);
 	
-	public List<TransactionBoundary> getAllTransactionsFromBankApi(BankAccountBoundary bankAccountBoundary);
+	public List<TransactionBoundary> getAllTransactionsFromBankApi(List<BankAccountBoundary> bankAccountBoundary);
 
 }

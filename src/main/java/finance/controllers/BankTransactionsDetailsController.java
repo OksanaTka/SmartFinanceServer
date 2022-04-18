@@ -29,5 +29,7 @@ public class BankTransactionsDetailsController {
 			@RequestBody BankTransactionsDetailsBoundary bankTransactionsDetails) {
 		return bankTransactionsDetailsService.createBankTransactionsDetails(bankTransactionsDetails);
 	}
+	
+	
 
 }

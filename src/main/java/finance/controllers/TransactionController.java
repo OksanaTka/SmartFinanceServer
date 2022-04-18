@@ -70,7 +70,7 @@ public class TransactionController {
 	}
 	
 	@RequestMapping(path = "/transaction/getAll/bankApi", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
-	public TransactionBoundary[] getAllTransactionsFromBankApi(@RequestBody BankAccountBoundary bankAccountBoundary) {
+	public TransactionBoundary[] getAllTransactionsFromBankApi(@RequestBody List<BankAccountBoundary> bankAccountBoundary) {
 		return transactionService.getAllTransactionsFromBankApi(bankAccountBoundary)
 				.toArray(new TransactionBoundary[0]);
 	}

@@ -161,60 +161,63 @@ public class TransactionJpa implements TransactionService {
 	}
 
 	@Override
-	public List<TransactionBoundary> getAllTransactionsFromBankApi(BankAccountBoundary bankAccountBoundary) {
-		utils.assertNull(bankAccountBoundary);
-		utils.assertNull(bankAccountBoundary.getAccountId());
-		utils.assertNull(bankAccountBoundary.getBankId());
-		utils.assertNull(bankAccountBoundary.getBankBranch());
-		utils.assertNull(bankAccountBoundary.getBankAccountNumber());
-
-		String bankId = bankAccountBoundary.getBankId();
-		String bankBranch = bankAccountBoundary.getBankBranch();
-		String bankAccountNum = bankAccountBoundary.getBankAccountNumber();
-
-	
-		// get bank account from DB
-		List<TransactionEntity> transactions = this.transactionDao
-				.findAllByUserIdOrderByDate(bankAccountBoundary.getUserId());
-
-		List<BankTransactionsDetailsEntity> transactionsDetails;
-
-		if (!transactions.isEmpty()) {
+	public List<TransactionBoundary> getAllTransactionsFromBankApi(List<BankAccountBoundary> bankAccountBoundarys) {
+		List<TransactionEntity> transactionsList = new ArrayList<>();
+		
+		for (BankAccountBoundary bankAccountBoundary : bankAccountBoundarys) {
 			
-			// get last transaction from DB
-			TransactionEntity lastTransaction = transactions.get(transactions.size() - 1);
-			String date = lastTransaction.getDate();
-			
-			// get all transaction after last updated day
-			transactionsDetails = this.bankTransactionsDetailsDao
-					.findAllByBankIdAndBankBranchAndBankAccountNumberAndDateAfter(bankId, bankBranch, bankAccountNum,
-							date);
+			utils.assertNull(bankAccountBoundary);
+			utils.assertNull(bankAccountBoundary.getAccountId());
+			utils.assertNull(bankAccountBoundary.getBankId());
+			utils.assertNull(bankAccountBoundary.getBankBranch());
+			utils.assertNull(bankAccountBoundary.getBankAccountNumber());
 
-		} else {
-			/// get all transaction from bank
-			
-			transactionsDetails = this.bankTransactionsDetailsDao
-					.findAllByBankIdAndBankBranchAndBankAccountNumber(bankId, bankBranch, bankAccountNum);
-			
+			String bankId = bankAccountBoundary.getBankId();
+			String bankBranch = bankAccountBoundary.getBankBranch();
+			String bankAccountNum = bankAccountBoundary.getBankAccountNumber();
 
-		}
-		if (transactionsDetails != null && !transactionsDetails.isEmpty()) {
-			List<TransactionEntity> transactionsList = new ArrayList<>();
-			// add transactions to DB
-			for (BankTransactionsDetailsEntity bankTransactionsDetailsEntity : transactionsDetails) {
-				TransactionEntity entity = new TransactionEntity();
-				entity.setBankAccountId(bankAccountBoundary.getAccountId());
-				entity.setAmount(bankTransactionsDetailsEntity.getAmount());
-				entity.setBankAccountId(bankAccountBoundary.getAccountId());
-				entity.setCategoryId(bankTransactionsDetailsEntity.getCategoryId());
-				entity.setDate(bankTransactionsDetailsEntity.getDate());
-				entity.setUserId(bankAccountBoundary.getUserId());
-				entity = this.transactionDao.save(entity);
-				transactionsList.add(entity);
+			// get bank account from DB
+			List<TransactionEntity> transactions = this.transactionDao
+					.findAllByUserIdAndBankAccountIdOrderByDate(bankAccountBoundary.getUserId(), bankAccountBoundary.getAccountId());
+
+			List<BankTransactionsDetailsEntity> transactionsDetails;
+
+			if (!transactions.isEmpty()) {
+				
+				// get last transaction from DB
+				TransactionEntity lastTransaction = transactions.get(transactions.size() - 1);
+				String date = lastTransaction.getDate();
+				System.err.println(date);
+				System.err.println(lastTransaction.getBankAccountId());
+				
+				// get all transaction after last updated day
+				transactionsDetails = this.bankTransactionsDetailsDao
+						.findAllByBankIdAndBankBranchAndBankAccountNumberAndDateAfter(bankId, bankBranch, bankAccountNum,
+								date);
+			} else {
+				/// get all transaction from bank
+				
+				transactionsDetails = this.bankTransactionsDetailsDao
+						.findAllByBankIdAndBankBranchAndBankAccountNumber(bankId, bankBranch, bankAccountNum);
+				
 			}
-			return transactionsList.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
+			if (transactionsDetails != null && !transactionsDetails.isEmpty()) {
+				// add transactions to DB
+				for (BankTransactionsDetailsEntity bankTransactionsDetailsEntity : transactionsDetails) {
+					TransactionEntity entity = new TransactionEntity();
+					entity.setBankAccountId(bankAccountBoundary.getAccountId());
+					entity.setAmount(bankTransactionsDetailsEntity.getAmount());
+					entity.setBankAccountId(bankAccountBoundary.getAccountId());
+					entity.setCategoryId(bankTransactionsDetailsEntity.getCategoryId());
+					entity.setDate(bankTransactionsDetailsEntity.getDate());
+					entity.setUserId(bankAccountBoundary.getUserId());
+					entity = this.transactionDao.save(entity);
+					transactionsList.add(entity);
+				}
+			}
 		}
-		return null;
+		
+		return transactionsList.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
 	}
 
 }

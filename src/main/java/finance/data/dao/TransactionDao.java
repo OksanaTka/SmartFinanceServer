@@ -30,5 +30,8 @@ public interface TransactionDao extends PagingAndSortingRepository<TransactionEn
 
 	// Get all transactions of the user by date
 	public List<TransactionEntity> findAllByUserIdOrderByDate(@Param("userId") String userId);
+	
+	// Get all transactions of the user by date
+		public List<TransactionEntity> findAllByUserIdAndBankAccountIdOrderByDate(@Param("userId") String userId, @Param("bankAccountId") String bankAccountId);
 
 }
