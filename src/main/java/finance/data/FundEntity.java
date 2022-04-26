@@ -10,7 +10,6 @@ public class FundEntity {
 	
 	@Id
 	private String fundId;
-	
 	private String fundName;
 	private String fundIcon;
 	

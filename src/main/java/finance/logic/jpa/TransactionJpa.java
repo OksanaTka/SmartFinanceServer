@@ -162,16 +162,15 @@ public class TransactionJpa implements TransactionService {
 
 	@Override
 	public List<TransactionBoundary> getAllTransactionsFromBankApi(List<BankAccountBoundary> bankAccountBoundarys) {
+		
 		List<TransactionEntity> transactionsList = new ArrayList<>();
 		
 		for (BankAccountBoundary bankAccountBoundary : bankAccountBoundarys) {
-			
 			utils.assertNull(bankAccountBoundary);
 			utils.assertNull(bankAccountBoundary.getAccountId());
 			utils.assertNull(bankAccountBoundary.getBankId());
 			utils.assertNull(bankAccountBoundary.getBankBranch());
 			utils.assertNull(bankAccountBoundary.getBankAccountNumber());
-
 			String bankId = bankAccountBoundary.getBankId();
 			String bankBranch = bankAccountBoundary.getBankBranch();
 			String bankAccountNum = bankAccountBoundary.getBankAccountNumber();
@@ -179,11 +178,11 @@ public class TransactionJpa implements TransactionService {
 			// get bank account from DB
 			List<TransactionEntity> transactions = this.transactionDao
 					.findAllByUserIdAndBankAccountIdOrderByDate(bankAccountBoundary.getUserId(), bankAccountBoundary.getAccountId());
+			
 
 			List<BankTransactionsDetailsEntity> transactionsDetails;
 
 			if (!transactions.isEmpty()) {
-				
 				// get last transaction from DB
 				TransactionEntity lastTransaction = transactions.get(transactions.size() - 1);
 				String date = lastTransaction.getDate();

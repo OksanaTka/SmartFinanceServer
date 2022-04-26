@@ -42,6 +42,7 @@ public class BankAccountController {
 
 	@RequestMapping(path = "/bankAccount/getAll/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public BankAccountBoundary[] getAllBankAccounts(@PathVariable("userId") String userId) {
+		System.out.println("userId: "+userId);
 		return bankAccountsService.getAllBankAccounts(userId).toArray(new BankAccountBoundary[0]);
 	}
 

@@ -28,7 +28,6 @@ public class BankAccountDetailsController {
 	public BankAccountDetailsBoundary createBankAccountDetails(
 			@RequestBody BankAccountDetailsBoundary bankAccountDetails) {
 		
-		System.out.println("->>>>>>>>>>>>>>>>> Controller !");
 		return bankAccountDetailsService.createBankAccountDetails(bankAccountDetails);
 	}
 
