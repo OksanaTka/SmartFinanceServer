@@ -1,7 +1,6 @@
 package finance.logic.converters;
 
 import org.springframework.stereotype.Component;
-
 import finance.boundaries.BankAccountDetailsBoundary;
 import finance.data.BankAccountDetailsEntity;
 
@@ -11,28 +10,28 @@ public class BankAccountDetailsConverterImplementation
 
 	@Override
 	public BankAccountDetailsBoundary toBoundary(BankAccountDetailsEntity entity) {
-		BankAccountDetailsBoundary ib = new BankAccountDetailsBoundary();
-		ib.setAccountCode(entity.getAccountCode());
-		ib.setAccountPassword(entity.getAccountPassword());
-		ib.setBankAccountDetailsId(entity.getBankAccountDetailsId());
-		ib.setBankAccountNumber(entity.getBankAccountNumber());
-		ib.setBankBranch(entity.getBankBranch());
-		ib.setBankId(entity.getBankId());
-
-		return ib;
+		BankAccountDetailsBoundary boundary = new BankAccountDetailsBoundary();
+		boundary.setAccountCode(entity.getAccountCode());
+		boundary.setAccountPassword(entity.getAccountPassword());
+		boundary.setBankAccountDetailsId(entity.getBankAccountDetailsId());
+		boundary.setBankAccountNumber(entity.getBankAccountNumber());
+		boundary.setBankBranch(entity.getBankBranch());
+		boundary.setBankId(entity.getBankId());
+		boundary.setBalance(entity.getBalance());
+		return boundary;
 	}
 
 	@Override
 	public BankAccountDetailsEntity fromBoundary(BankAccountDetailsBoundary boundary) {
-		BankAccountDetailsEntity ie = new BankAccountDetailsEntity();
-		ie.setAccountCode(boundary.getAccountCode());
-		ie.setAccountPassword(boundary.getAccountPassword());
-		ie.setBankAccountDetailsId(boundary.getBankAccountDetailsId());
-		ie.setBankAccountNumber(boundary.getBankAccountNumber());
-		ie.setBankBranch(boundary.getBankBranch());
-		ie.setBankId(boundary.getBankId());
-
-		return ie;
+		BankAccountDetailsEntity entity = new BankAccountDetailsEntity();
+		entity.setAccountCode(boundary.getAccountCode());
+		entity.setAccountPassword(boundary.getAccountPassword());
+		entity.setBankAccountDetailsId(boundary.getBankAccountDetailsId());
+		entity.setBankAccountNumber(boundary.getBankAccountNumber());
+		entity.setBankBranch(boundary.getBankBranch());
+		entity.setBankId(boundary.getBankId());
+		entity.setBalance(boundary.getBalance());
+		return entity;
 	}
 
 }

@@ -61,7 +61,6 @@ public class UserJpa implements UserService {
 		entity.setEmail(user.getEmail());
 		entity.setPassword((user.getPassword()));
 		entity = this.userDao.save(entity);
-
 		return this.entityConverter.toBoundary(entity);
 	}
 
@@ -72,10 +71,12 @@ public class UserJpa implements UserService {
 		utils.assertValidEmail(userEmail);
 		utils.assertNull(password);
 
+		//Get the user from DB
 		List<UserEntity> users = this.userDao.findAllByEmail(userEmail);
 
 		if (!users.isEmpty()) {
 			UserEntity entity = users.get(0);
+			//Check if the password is correct
 			if (entity.getPassword().equals(password)) {
 				return this.entityConverter.toBoundary(entity);
 			} else {
@@ -93,17 +94,18 @@ public class UserJpa implements UserService {
 		utils.assertValidEmail(userEmail);
 		utils.assertNull(password);
 
+		//Get the user from DB
 		List<UserEntity> users = this.userDao.findAllByEmail(userEmail);
 
 		if (!users.isEmpty()) {
 			UserEntity entity = users.get(0);
-
 			if (entity.getPassword().equals(password)) {
 				return this.entityConverter.toBoundary(entity);
 			} else {
 				throw new UnauthorizedException("password incorrect: " + password);
 			}
 		} else {
+			//If user logged in the first time - Create new user
 			UserBoundary user = new UserBoundary();
 			user.setPassword(password);
 			user.setEmail(userEmail.toLowerCase());
@@ -113,12 +115,14 @@ public class UserJpa implements UserService {
 
 	@Override
 	@Transactional
-	public UserBoundary updateUser(String userId, UserBoundary update) {
+	public void updateUser(String userId, UserBoundary update) {
 		utils.assertNull(update);
 		utils.assertNull(userId);
 
+		//Get user from DB
 		List<UserEntity> users = this.userDao.findAllById(userId);
 
+		//Update the user details
 		if (!users.isEmpty()) {
 			UserEntity existing = users.get(0);
 			if (update.getAvatar() != null) {
@@ -146,10 +150,10 @@ public class UserJpa implements UserService {
 				
 				String newEmail = update.getEmail().toLowerCase();
 				if (utils.checkValidEmail(newEmail)) {
-					// check if this email already exist
+					// check if this email already exists
 					List<UserEntity> newUsers = this.userDao.findAllByEmail(newEmail);
 
-					// set new email to user
+					// set new email for user
 					if (newUsers.isEmpty()) {
 						existing.setEmail(newEmail);
 					} else {
@@ -159,10 +163,7 @@ public class UserJpa implements UserService {
 
 				}
 			}
-
 			existing = this.userDao.save(existing);
-			return this.entityConverter.toBoundary(existing);
-
 		} else {
 			throw new NotFoundException("could not find user by email: " + userId);
 		}

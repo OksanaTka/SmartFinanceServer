@@ -1,11 +1,8 @@
 package finance.logic.jpa;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import finance.boundaries.BankAccountBoundary;
 import finance.boundaries.BankTransactionsDetailsBoundary;
 import finance.data.BankTransactionsDetailsEntity;
 import finance.data.dao.BankTransactionsDetailsDao;

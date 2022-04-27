@@ -1,6 +1,5 @@
 package finance.logic.jpa;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,17 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import finance.boundaries.NewPensionAccountDetails;
 import finance.boundaries.PensionAccountBoundary;
 import finance.data.FundEntity;
 import finance.data.PensionAccountEntity;
+import finance.data.PensionDetailsEntity;
 import finance.data.UserEntity;
 import finance.data.dao.FundDao;
 import finance.data.dao.PensionAccountDao;
+import finance.data.dao.PensionDetailsDao;
 import finance.data.dao.UserDao;
 import finance.logic.PensionAccountService;
-import finance.logic.converters.EntityConverter;
+import finance.logic.converters.ExtendedEntityConverter;
 import finance.utils.ConflictException;
 import finance.utils.NotFoundException;
+import finance.utils.UnauthorizedException;
 import finance.utils.UnsupportedExecption;
 import finance.utils.Utils;
 
@@ -26,13 +29,13 @@ import finance.utils.Utils;
 public class PensionAccountJpa implements PensionAccountService {
 
 	private PensionAccountDao pensionDao;
+	private PensionDetailsDao pensionDetailsDao;
 	private FundDao fundDao;
 	private UserDao userDao;
 	private Utils utils;
-	private EntityConverter<PensionAccountEntity, PensionAccountBoundary> entityConverter;
+	private ExtendedEntityConverter<PensionAccountEntity, PensionAccountBoundary> entityConverter;
 
 	public PensionAccountJpa() {
-
 	}
 
 	@Autowired
@@ -56,16 +59,25 @@ public class PensionAccountJpa implements PensionAccountService {
 	}
 
 	@Autowired
-	public void setEntityConverter(EntityConverter<PensionAccountEntity, PensionAccountBoundary> entityConverter) {
+	public void setPensionDetailsDao(PensionDetailsDao pensionDetailsDao) {
+		this.pensionDetailsDao = pensionDetailsDao;
+	}
+
+	@Autowired
+	public void setEntityConverter(
+			ExtendedEntityConverter<PensionAccountEntity, PensionAccountBoundary> entityConverter) {
 		this.entityConverter = entityConverter;
 	}
 
 	@Override
 	@Transactional
-	public PensionAccountBoundary createPensionAccount(PensionAccountBoundary pensionAccount) {
+	public PensionAccountBoundary createPensionAccount(NewPensionAccountDetails pensionAccount) {
 		utils.assertNull(pensionAccount);
 		utils.assertNull(pensionAccount.getUserId());
 		utils.assertNull(pensionAccount.getFundId());
+		utils.assertNull(pensionAccount.getIdentityNumber());
+		utils.assertNull(pensionAccount.getCode());
+		utils.assertNull(pensionAccount.getPhone());
 
 		// Check if the Fund is supported
 		List<FundEntity> funds = this.fundDao.findAllByFundId(pensionAccount.getFundId());
@@ -73,24 +85,68 @@ public class PensionAccountJpa implements PensionAccountService {
 			throw new UnsupportedExecption("Fund isn't supported " + pensionAccount.getFundId());
 		}
 
-		// Check if the pension account already exists
-		List<PensionAccountEntity> pensionAccounts = this.pensionDao.findAllByUserId(pensionAccount.getUserId());
-		if (!pensionAccounts.isEmpty()) {
-			for (Iterator<PensionAccountEntity> iterator = pensionAccounts.iterator(); iterator.hasNext();) {
-				PensionAccountEntity pensionAccountEntity = (PensionAccountEntity) iterator.next();
+		// Connect to pension API and get details
+		List<PensionDetailsEntity> pensionDetails = this.pensionDetailsDao
+				.findAllByFundIdAndIdentityNumber(pensionAccount.getFundId(), pensionAccount.getIdentityNumber());
 
-				// Check if there is a pension account with this fund company
-				if (pensionAccountEntity.getFundId().equals(pensionAccount.getFundId())) {
-					throw new ConflictException("Account already exists: " + pensionAccountEntity.getPensionId());
-				}
-			}
+		if (pensionDetails.isEmpty()) {
+			throw new NotFoundException("Account doesn't exist");
 		}
 
-		PensionAccountEntity entity = this.entityConverter.fromBoundary(pensionAccount);
-		entity.setFundId(pensionAccount.getFundId());
-		entity.setUserId(pensionAccount.getUserId());
+		PensionDetailsEntity pensionDetailsEntity = pensionDetails.get(0);
+		if (!pensionDetailsEntity.getCode().equals(pensionAccount.getCode())) {
+			throw new UnauthorizedException("Account code is incorrect ");
+		}
+
+		// Check if the pension account already exists in database
+		List<PensionAccountEntity> pensionAccounts = this.pensionDao
+				.findAllByFundIdAndUserId(pensionAccount.getFundId(), pensionAccount.getUserId());
+		if (!pensionAccounts.isEmpty()) {
+			throw new ConflictException("Account already exists: " + pensionAccounts.get(0).getPensionId());
+		}
+
+		PensionAccountEntity entity = this.entityConverter.fromDetails(pensionDetailsEntity);
 		entity = this.pensionDao.save(entity);
 		return this.entityConverter.toBoundary(entity);
+	}
+
+	@Override
+	@Transactional
+	public PensionAccountBoundary updatePensionAccount(String userId,String fundId) {
+		utils.assertNull(userId);
+		utils.assertNull(fundId);
+
+		// Get user from DB
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if (users.isEmpty()) {
+			throw new NotFoundException("User doesn't exist");
+		}
+		UserEntity user = users.get(0);
+
+		// Connect to pension API
+		List<PensionDetailsEntity> pensionDetails = this.pensionDetailsDao.findAllByFundIdAndIdentityNumber(fundId,
+				user.getIdentity_number());
+
+		if (pensionDetails.isEmpty()) {
+			throw new NotFoundException("Account doesn't exist");
+		}
+
+		PensionDetailsEntity updatedDetails = pensionDetails.get(0);
+		// Get pension account from DB and update
+		List<PensionAccountEntity> pensionAccounts = this.pensionDao.findAllByFundIdAndUserId(fundId, userId);
+		if (pensionAccounts.isEmpty()) {
+			throw new ConflictException("Account doesn't exist " + pensionAccounts.get(0).getPensionId());
+		}
+
+		PensionAccountEntity pensionAccount = pensionAccounts.get(0);
+		pensionAccount.setCompensation(updatedDetails.getCompensation());
+		pensionAccount.setEmployerDeposit(updatedDetails.getEmployerDeposit());
+		pensionAccount.setManagementFee(updatedDetails.getManagementFee());
+		pensionAccount.setTotalAmount(updatedDetails.getTotalAmount());
+		pensionAccount.setWorkerDeposit(updatedDetails.getWorkerDeposit());
+
+		pensionAccount = this.pensionDao.save(pensionAccount);
+		return this.entityConverter.toBoundary(pensionAccount);
 	}
 
 	@Override

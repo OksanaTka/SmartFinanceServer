@@ -30,6 +30,4 @@ public class BankTransactionsDetailsController {
 		return bankTransactionsDetailsService.createBankTransactionsDetails(bankTransactionsDetails);
 	}
 	
-	
-
 }

@@ -1,21 +1,12 @@
 package finance.logic.converters;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import finance.boundaries.UserBoundary;
-import finance.boundaries.UserId;
 import finance.data.UserEntity;
-import finance.utils.Utils;
 
 @Component
 public class UserEntityConverterImplementation implements EntityConverter<UserEntity, UserBoundary> {
-	private Utils utils;
-
-	@Autowired
-	public void setUtils(Utils utils) {
-		this.utils = utils;
-	}
 
 	@Override
 	public UserBoundary toBoundary(UserEntity entity) {

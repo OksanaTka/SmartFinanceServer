@@ -33,11 +33,6 @@ public class TransactionController {
 		return transactionService.createTransaction(details);
 	}
 
-	@RequestMapping(path = "/transaction/getAll/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public TransactionBoundary[] getTransactionsByUserId(@PathVariable("userId") String userId) {
-		return transactionService.getTransactionsByUserId(userId).toArray(new TransactionBoundary[0]);
-	}
-
 	@RequestMapping(path = "/transaction/getAll/{userId}/{categoryId}/{date}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public TransactionBoundary[] getTransactionsByUserIdAndCategoryAndDateAfter(@PathVariable("userId") String userId,
 			@PathVariable("categoryId") List<String> categoryId,@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  String date) {
@@ -52,27 +47,9 @@ public class TransactionController {
 				.toArray(new TransactionBoundary[0]);
 	}
 	
-	@RequestMapping(path = "/transaction/{transactionId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public TransactionBoundary getSpecificTransaction(@PathVariable("transactionId") String transactionId) {
-		return transactionService.getSpecificTransaction(transactionId);
-	}
-
-	@RequestMapping(path = "/transaction/{transactionId}", method = RequestMethod.DELETE)
-	public void deleteTransaction(@PathVariable("transactionId") String transactionId) {
-		transactionService.deleteTransaction(transactionId);
-	}
-
-	@RequestMapping(path = "/transaction/category/{userId}/{categoryId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public TransactionBoundary[] getAllUserTransactionsByCategory(@PathVariable("userId") String userId,
-			@PathVariable("categoryId") String categoryId) {
-		return transactionService.getAllUserTransactionsByCategory(userId, categoryId)
-				.toArray(new TransactionBoundary[0]);
-	}
-	
 	@RequestMapping(path = "/transaction/getAll/bankApi", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
 	public TransactionBoundary[] getAllTransactionsFromBankApi(@RequestBody List<BankAccountBoundary> bankAccountBoundary) {
 		return transactionService.getAllTransactionsFromBankApi(bankAccountBoundary)
 				.toArray(new TransactionBoundary[0]);
 	}
-
 }

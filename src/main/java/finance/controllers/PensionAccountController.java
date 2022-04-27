@@ -23,15 +23,17 @@ public class PensionAccountController {
 
 	@RequestMapping(path = "/pensionAccount", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public PensionAccountBoundary createPensionAccount(@RequestBody NewPensionAccountDetails details) {
-		PensionAccountBoundary pensionAccount = new PensionAccountBoundary();
-		pensionAccount.setFundId(details.getFundId());
-		pensionAccount.setUserId(details.getUserId());
-		return pensionAccountService.createPensionAccount(pensionAccount);
+		return pensionAccountService.createPensionAccount(details);
 	}
 
 	@RequestMapping(path = "/pensionAccount/{pensionAccountId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public PensionAccountBoundary getSpecificBankAccount(@PathVariable("pensionAccountId") String pensionAccountId) {
 		return pensionAccountService.getSpecificPensionAccount(pensionAccountId);
+	}
+
+	@RequestMapping(path = "/pensionAccount/{userId}/{fundId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public void updatePensionAccount(@PathVariable("userId") String userId, @PathVariable("fundId") String fundId) {
+		pensionAccountService.updatePensionAccount(userId, fundId);
 	}
 
 	@RequestMapping(path = "/pensionAccount/getAll/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

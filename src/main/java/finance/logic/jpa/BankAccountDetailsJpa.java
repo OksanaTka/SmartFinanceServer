@@ -18,8 +18,6 @@ import finance.utils.Utils;
 public class BankAccountDetailsJpa implements BankAccountDetailsService {
 
 	private BankAccountDetailsDao bankAccountDetailsDao;
-//	private BankAccountDao bankAccountDao;
-//	private BankDao bankDao;
 	private Utils utils;
 	private EntityConverter<BankAccountDetailsEntity, BankAccountDetailsBoundary> entityConverter;
 

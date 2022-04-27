@@ -30,7 +30,6 @@ public class CategoryController {
 		return categoryService.createCategory(category);
 	}
 	
-	
 	@RequestMapping(path = "/category/getAll", 
 			method = RequestMethod.GET, 
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,5 +37,4 @@ public class CategoryController {
 			@RequestParam(name = "size", required = false, defaultValue = pageSize) int size) {
 		return categoryService.getAllCategories(page, size).toArray(new CategoryBoundary[0]);
 	}
-
 }

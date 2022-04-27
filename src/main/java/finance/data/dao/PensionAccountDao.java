@@ -9,9 +9,16 @@ import finance.data.PensionAccountEntity;
 
 public interface PensionAccountDao extends PagingAndSortingRepository<PensionAccountEntity, String> {
 
-	public List<PensionAccountEntity> findAllByUserId(@Param("userId") String userId);
+	public List<PensionAccountEntity> findAllByUserId(
+			@Param("userId") String userId);
 
-	public List<PensionAccountEntity> findAllByFundId(@Param("fundId") String fundId);
+	public List<PensionAccountEntity> findAllByFundId(
+			@Param("fundId") String fundId);
+	
+	public List<PensionAccountEntity> findAllByFundIdAndUserId(
+			@Param("fundId") String fundId,
+			@Param("userId") String userId);
 
-	public List<PensionAccountEntity> findAllByPensionId(@Param("pensionId") String pensionId);
+	public List<PensionAccountEntity> findAllByPensionId(
+			@Param("pensionId") String pensionId);
 }

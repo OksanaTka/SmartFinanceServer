@@ -4,9 +4,10 @@ import org.springframework.stereotype.Component;
 
 import finance.boundaries.PensionAccountBoundary;
 import finance.data.PensionAccountEntity;
+import finance.data.PensionDetailsEntity;
 
 @Component
-public class PensionAccountEntityConverterImplementation implements EntityConverter<PensionAccountEntity, PensionAccountBoundary>{
+public class PensionAccountEntityConverterImplementation implements ExtendedEntityConverter<PensionAccountEntity, PensionAccountBoundary>{
 
 	@Override
 	public PensionAccountBoundary toBoundary(PensionAccountEntity entity) {
@@ -33,6 +34,19 @@ public class PensionAccountEntityConverterImplementation implements EntityConver
 		entity.setUserId(boundary.getUserId());
 		entity.setTotalAmount(boundary.getTotalAmount());
 		return entity;
+	}
+	
+	public PensionAccountEntity fromDetails(PensionDetailsEntity pensionDetailsEntity) {
+		PensionAccountEntity entity = new PensionAccountEntity();
+		entity.setFundId(pensionDetailsEntity.getFundId());
+		entity.setUserId(pensionDetailsEntity.getUserId());
+		entity.setEmployerDeposit(pensionDetailsEntity.getEmployerDeposit());
+		entity.setWorkerDeposit(pensionDetailsEntity.getWorkerDeposit());
+		entity.setCompensation(pensionDetailsEntity.getCompensation());
+		entity.setTotalAmount(pensionDetailsEntity.getTotalAmount());
+		entity.setManagementFee(pensionDetailsEntity.getManagementFee());
+		return entity;
+		
 	}
 
 }

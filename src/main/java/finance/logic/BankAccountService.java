@@ -13,5 +13,7 @@ public interface BankAccountService {
 	public List<BankAccountBoundary> getAllBankAccounts(String userId);
 
 	public void deleteBankAccount(String userId, String bankAccountId);
+	
+	public void updateBalance(List<BankAccountBoundary> bankAccountBoundarys);
 
 }

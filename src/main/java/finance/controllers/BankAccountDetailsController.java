@@ -27,7 +27,6 @@ public class BankAccountDetailsController {
 	@RequestMapping(path = "/bankAccountDetails", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public BankAccountDetailsBoundary createBankAccountDetails(
 			@RequestBody BankAccountDetailsBoundary bankAccountDetails) {
-		
 		return bankAccountDetailsService.createBankAccountDetails(bankAccountDetails);
 	}
 

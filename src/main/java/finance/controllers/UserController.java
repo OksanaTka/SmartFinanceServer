@@ -48,7 +48,7 @@ public class UserController {
 	}
 
 	@RequestMapping(path = "/user/{userId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void update(@PathVariable("userId") String userId, @RequestBody UserBoundary user) {
+	public void updateUser(@PathVariable("userId") String userId, @RequestBody UserBoundary user) {
 		userService.updateUser(userId, user);
 	}
 

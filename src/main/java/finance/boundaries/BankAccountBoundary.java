@@ -9,6 +9,7 @@ public class BankAccountBoundary {
 	private String bankAccountNumber;
 	private String accountCode;
 	private String accountPassword;
+	private String balance;
 
 	public BankAccountBoundary() {
 		super();
@@ -70,4 +71,12 @@ public class BankAccountBoundary {
 		this.accountPassword = accountPassword;
 	}
 
+	public String getBalance() {
+		return balance;
+	}
+
+	public void setBalance(String balance) {
+		this.balance = balance;
+	}
+	
 }

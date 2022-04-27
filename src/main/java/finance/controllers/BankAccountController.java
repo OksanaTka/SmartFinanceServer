@@ -1,5 +1,7 @@
 package finance.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,5 +52,11 @@ public class BankAccountController {
 	public void deleteBankAccount(@PathVariable("userId") String userId, @PathVariable("bankAccountId") String bankAccountId) {
 		bankAccountsService.deleteBankAccount(userId, bankAccountId);
 	}
-
+	
+	@RequestMapping(path = "/bankAccount/balance", 
+			method = RequestMethod.PUT, 
+			consumes = MediaType.APPLICATION_JSON_VALUE)
+	public void update(@RequestBody List<BankAccountBoundary> bankAccountBoundary) {
+		bankAccountsService.updateBalance(bankAccountBoundary);
+	}
 }

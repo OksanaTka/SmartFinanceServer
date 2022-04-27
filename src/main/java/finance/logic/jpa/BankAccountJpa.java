@@ -83,30 +83,34 @@ public class BankAccountJpa implements BankAccountService {
 			throw new UnsupportedExecption("Bank isnt supported " + bankAccount.getBankId());
 		}
 
-		// Check if the account already exists
+		// Connect with Bank and get details
+		List<BankAccountDetailsEntity> bankAccountDetails = this.bankAccountDetailsDao
+				.findAllByBankIdAndAccountCodeAndAccountPassword(bankAccount.getBankId(), bankAccount.getAccountCode(),
+						bankAccount.getAccountPassword());
+		if (bankAccountDetails.isEmpty()) {
+			throw new UnauthorizedException("Account code or password is incorrect ");
+		}
+
+		bankAccount.setBankBranch(bankAccountDetails.get(0).getBankBranch());
+		bankAccount.setBankAccountNumber(bankAccountDetails.get(0).getBankAccountNumber());
+		bankAccount.setBalance(bankAccountDetails.get(0).getBalance());
+
+		// Check if the account already exists in database
 		List<BankAccountEntity> bankAccounts = this.bankAccountDao.findAllByBankId(bankAccount.getBankId());
 		if (!bankAccounts.isEmpty()) {
 			for (Iterator<BankAccountEntity> iterator = bankAccounts.iterator(); iterator.hasNext();) {
 				BankAccountEntity bankAccountEntity = (BankAccountEntity) iterator.next();
-				if (bankAccountEntity.getBankAccountNumber().equals(bankAccount.getBankAccountNumber())) {
+
+				if (bankAccountEntity.getBankAccountNumber().equals(bankAccount.getBankAccountNumber())
+						&& bankAccountEntity.getBankBranch().equals(bankAccount.getBankBranch())) {
 					throw new ConflictException("Account already exists: " + bankAccount.getBankAccountNumber());
 				}
 			}
 		}
 
-		List<BankAccountDetailsEntity> bankAccountDetails = this.bankAccountDetailsDao
-				.findAllByBankIdAndAccountCodeAndAccountPassword(bankAccount.getBankId(), bankAccount.getAccountCode(),
-						bankAccount.getAccountPassword());
-		if (bankAccountDetails.isEmpty()) {
-			throw new UnauthorizedException("Acoount code or password is incorrect ");
-		}
-
 		BankAccountEntity entity = this.entityConverter.fromBoundary(bankAccount);
-	
-		entity.setBankBranch(bankAccountDetails.get(0).getBankBranch());
-		entity.setBankAccountNumber(bankAccountDetails.get(0).getBankAccountNumber());
 		entity = this.bankAccountDao.save(entity);
-		
+
 		return this.entityConverter.toBoundary(entity);
 	}
 
@@ -155,6 +159,32 @@ public class BankAccountJpa implements BankAccountService {
 			}
 		} else {
 			throw new NotFoundException("There is no bank account with this id: " + bankAccountId);
+		}
+
+	}
+
+	@Override
+	public void updateBalance(List<BankAccountBoundary> bankAccountBoundarys) {
+		for (BankAccountBoundary bankAccountBoundary : bankAccountBoundarys) {
+			utils.assertNull(bankAccountBoundary);
+			utils.assertNull(bankAccountBoundary.getBankId());
+			utils.assertNull(bankAccountBoundary.getAccountCode());
+			utils.assertNull(bankAccountBoundary.getAccountPassword());
+
+			// Connect with Bank and get balance
+			List<BankAccountDetailsEntity> bankAccountDetails = this.bankAccountDetailsDao
+					.findAllByBankIdAndAccountCodeAndAccountPassword(bankAccountBoundary.getBankId(),
+							bankAccountBoundary.getAccountCode(), bankAccountBoundary.getAccountPassword());
+			if (bankAccountDetails.isEmpty()) {
+				throw new UnauthorizedException("Account code or password is incorrect ");
+			}
+
+			// Get the bank with this bankId
+			List<BankAccountEntity> bankAccounts = this.bankAccountDao
+					.findAllByAccountId(bankAccountBoundary.getAccountId());
+			BankAccountEntity bankEntity = bankAccounts.get(0);
+			bankEntity.setBalance(bankAccountDetails.get(0).getBalance());
+			this.bankAccountDao.save(bankEntity);
 		}
 
 	}

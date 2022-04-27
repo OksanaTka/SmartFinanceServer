@@ -12,7 +12,7 @@ public interface UserService {
 	
 	public UserBoundary loginGmail(String userEmail,String password);
 
-	public UserBoundary updateUser(String userEmail, UserBoundary update);
+	public void updateUser(String userEmail, UserBoundary update);
 	
 	//Admin functions	
 	public List<UserBoundary> getAllUsers(int page, int size);
