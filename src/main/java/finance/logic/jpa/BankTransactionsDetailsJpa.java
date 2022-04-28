@@ -51,10 +51,6 @@ public class BankTransactionsDetailsJpa implements BankTransactionsDetailsServic
 		utils.assertNull(bankTransactionsDetails.getCategoryId());
 		utils.assertNull(bankTransactionsDetails.getDate());
 		
-		
-		
-		
-
 		BankTransactionsDetailsEntity entity = this.entityConverter.fromBoundary(bankTransactionsDetails);
 		entity = this.bankTransactionsDetailsDao.save(entity);
 

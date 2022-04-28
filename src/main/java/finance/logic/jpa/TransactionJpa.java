@@ -113,6 +113,12 @@ public class TransactionJpa implements TransactionService {
 		utils.assertNull(userId);
 		utils.assertNull(date);
 
+		// Check if user exists
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if (users.isEmpty()) {
+			throw new NotFoundException("Could not find user: " + userId);
+		}
+		
 		List<TransactionEntity> transactions = this.transactionDao.findAllByUserIdAndDateAfterOrderByDate(userId, date);
 
 		if (!transactions.isEmpty()) {
@@ -127,13 +133,17 @@ public class TransactionJpa implements TransactionService {
 	public List<TransactionBoundary> getAllTransactionsFromBankApi(List<BankAccountBoundary> bankAccountBoundarys) {
 
 		List<TransactionEntity> transactionsList = new ArrayList<>();
-
+		
 		for (BankAccountBoundary bankAccountBoundary : bankAccountBoundarys) {
 			utils.assertNull(bankAccountBoundary);
 			utils.assertNull(bankAccountBoundary.getAccountId());
+			System.err.println(bankAccountBoundary.getAccountId());
 			utils.assertNull(bankAccountBoundary.getBankId());
+			System.err.println(bankAccountBoundary.getBankId());
 			utils.assertNull(bankAccountBoundary.getBankBranch());
+			System.err.println(bankAccountBoundary.getBankBranch());
 			utils.assertNull(bankAccountBoundary.getBankAccountNumber());
+			System.err.println(bankAccountBoundary.getBankAccountNumber());
 			String bankId = bankAccountBoundary.getBankId();
 			String bankBranch = bankAccountBoundary.getBankBranch();
 			String bankAccountNum = bankAccountBoundary.getBankAccountNumber();

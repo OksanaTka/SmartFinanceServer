@@ -112,7 +112,7 @@ public class PensionAccountJpa implements PensionAccountService {
 
 	@Override
 	@Transactional
-	public PensionAccountBoundary updatePensionAccount(String userId,String fundId) {
+	public PensionAccountBoundary updatePensionAccount(String userId, String fundId) {
 		utils.assertNull(userId);
 		utils.assertNull(fundId);
 
@@ -165,6 +165,7 @@ public class PensionAccountJpa implements PensionAccountService {
 	public List<PensionAccountBoundary> getAllPensionAccounts(String userId) {
 		utils.assertNull(userId);
 
+		//Check if user exists
 		List<UserEntity> users = this.userDao.findAllById(userId);
 		if (!users.isEmpty()) {
 			UserEntity entity = users.get(0);
@@ -179,6 +180,12 @@ public class PensionAccountJpa implements PensionAccountService {
 	public void deletePensionAccount(String userId, String pensionId) {
 		utils.assertNull(userId);
 		utils.assertNull(pensionId);
+
+		// Check if user exists
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if (users.isEmpty()) {
+			throw new NotFoundException("Could not find user: " + userId);
+		}
 
 		// Get the pension account
 		List<PensionAccountEntity> pensionAccounts = this.pensionDao.findAllByPensionId(pensionId);

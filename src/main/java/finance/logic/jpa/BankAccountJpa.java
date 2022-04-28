@@ -144,11 +144,16 @@ public class BankAccountJpa implements BankAccountService {
 	public void deleteBankAccount(String userId, String bankAccountId) {
 		utils.assertNull(userId);
 		utils.assertNull(bankAccountId);
+		
+		//Check if user exists
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if(users.isEmpty()) {
+			throw new NotFoundException("Could not find user: " + userId);
+		}
 
 		// Get the bank with this bankId
 		List<BankAccountEntity> bankAccounts = this.bankAccountDao.findAllByAccountId(bankAccountId);
 		if (!bankAccounts.isEmpty()) {
-
 			// check if the account belongs to the user
 			BankAccountEntity bankAccount = bankAccounts.get(0);
 			if (bankAccount.getUserId().equals(userId)) {
