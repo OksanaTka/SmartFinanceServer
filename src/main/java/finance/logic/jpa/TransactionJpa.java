@@ -10,11 +10,16 @@ import org.springframework.stereotype.Service;
 import finance.boundaries.BankAccountBoundary;
 import finance.boundaries.TransactionBoundary;
 import finance.data.BankTransactionsDetailsEntity;
+import finance.data.CategoryEntity;
 import finance.data.TransactionEntity;
+import finance.data.UserEntity;
 import finance.data.dao.BankTransactionsDetailsDao;
+import finance.data.dao.CategoryDao;
 import finance.data.dao.TransactionDao;
+import finance.data.dao.UserDao;
 import finance.logic.TransactionService;
 import finance.logic.converters.EntityConverter;
+import finance.utils.ConflictException;
 import finance.utils.NotFoundException;
 import finance.utils.Utils;
 
@@ -23,6 +28,8 @@ public class TransactionJpa implements TransactionService {
 
 	private BankTransactionsDetailsDao bankTransactionsDetailsDao;
 	private TransactionDao transactionDao;
+	private UserDao userDao;
+	private CategoryDao categoryDao;
 	private Utils utils;
 	private EntityConverter<TransactionEntity, TransactionBoundary> entityConverter;
 
@@ -37,6 +44,16 @@ public class TransactionJpa implements TransactionService {
 	@Autowired
 	public void setTransactionDao(TransactionDao transactionDao) {
 		this.transactionDao = transactionDao;
+	}
+
+	@Autowired
+	public void setUserDao(UserDao userDao) {
+		this.userDao = userDao;
+	}
+
+	@Autowired
+	public void setCategoryDao(CategoryDao categoryDao) {
+		this.categoryDao = categoryDao;
 	}
 
 	@Autowired
@@ -60,13 +77,26 @@ public class TransactionJpa implements TransactionService {
 		return this.entityConverter.toBoundary(entity);
 	}
 
-
 	@Override
 	public List<TransactionBoundary> getTransactionsByUserIdAndCategoryAndDateAfter(String userId,
 			List<String> categoryId, String date) {
 		utils.assertNull(userId);
 		utils.assertNull(categoryId);
 		utils.assertNull(date);
+
+		// Check if user exists
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if (users.isEmpty()) {
+			throw new NotFoundException("Could not find user: " + userId);
+		}
+
+		// Check if categories exist
+		for (String category : categoryId) {
+			List<CategoryEntity> categories = this.categoryDao.findAllByCategoryId(category);
+			if (categories.isEmpty()) {
+				throw new ConflictException("Category doesn't exist " + category);
+			}
+		}
 
 		List<TransactionEntity> transactions = this.transactionDao
 				.findAllByUserIdAndCategoryIdInAndDateAfterOrderByDate(userId, categoryId, date);
@@ -95,9 +125,9 @@ public class TransactionJpa implements TransactionService {
 
 	@Override
 	public List<TransactionBoundary> getAllTransactionsFromBankApi(List<BankAccountBoundary> bankAccountBoundarys) {
-		
+
 		List<TransactionEntity> transactionsList = new ArrayList<>();
-		
+
 		for (BankAccountBoundary bankAccountBoundary : bankAccountBoundarys) {
 			utils.assertNull(bankAccountBoundary);
 			utils.assertNull(bankAccountBoundary.getAccountId());
@@ -109,27 +139,26 @@ public class TransactionJpa implements TransactionService {
 			String bankAccountNum = bankAccountBoundary.getBankAccountNumber();
 
 			// get transactions of bank account from DB
-			List<TransactionEntity> transactions = this.transactionDao
-					.findAllByUserIdAndBankAccountIdOrderByDate(bankAccountBoundary.getUserId(), bankAccountBoundary.getAccountId());
-			
+			List<TransactionEntity> transactions = this.transactionDao.findAllByUserIdAndBankAccountIdOrderByDate(
+					bankAccountBoundary.getUserId(), bankAccountBoundary.getAccountId());
+
 			List<BankTransactionsDetailsEntity> transactionsDetails;
 
 			if (!transactions.isEmpty()) {
 				// get last transaction from DB
 				TransactionEntity lastTransaction = transactions.get(transactions.size() - 1);
 				String date = lastTransaction.getDate();
-				
+
 				// get all transaction after last updated day
 				transactionsDetails = this.bankTransactionsDetailsDao
-						.findAllByBankIdAndBankBranchAndBankAccountNumberAndDateAfter(bankId, bankBranch, bankAccountNum,
-								date);
+						.findAllByBankIdAndBankBranchAndBankAccountNumberAndDateAfter(bankId, bankBranch,
+								bankAccountNum, date);
 			} else {
 				/// get all transaction from bank
 				transactionsDetails = this.bankTransactionsDetailsDao
 						.findAllByBankIdAndBankBranchAndBankAccountNumber(bankId, bankBranch, bankAccountNum);
 			}
-			
-			
+
 			if (transactionsDetails != null && !transactionsDetails.isEmpty()) {
 				// add transactions to DB
 				for (BankTransactionsDetailsEntity bankTransactionsDetailsEntity : transactionsDetails) {
@@ -145,7 +174,7 @@ public class TransactionJpa implements TransactionService {
 				}
 			}
 		}
-		
+
 		return transactionsList.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
 	}
 

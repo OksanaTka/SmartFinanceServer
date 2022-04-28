@@ -50,6 +50,8 @@ public class UserJpa implements UserService {
 		utils.assertNull(user.getEmail());
 		utils.assertValidEmail(user.getEmail());
 		utils.assertNull(user.getPassword());
+		utils.assertNull(user.getFirstName());
+		utils.assertNull(user.getLastName());
 
 		// Check if there is a user with the same email
 		List<UserEntity> users = this.userDao.findAllByEmail(user.getEmail());
