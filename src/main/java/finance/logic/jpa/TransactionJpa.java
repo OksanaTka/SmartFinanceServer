@@ -1,7 +1,13 @@
 package finance.logic.jpa;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +124,7 @@ public class TransactionJpa implements TransactionService {
 		if (users.isEmpty()) {
 			throw new NotFoundException("Could not find user: " + userId);
 		}
-		
+
 		List<TransactionEntity> transactions = this.transactionDao.findAllByUserIdAndDateAfterOrderByDate(userId, date);
 
 		if (!transactions.isEmpty()) {
@@ -133,7 +139,7 @@ public class TransactionJpa implements TransactionService {
 	public List<TransactionBoundary> getAllTransactionsFromBankApi(List<BankAccountBoundary> bankAccountBoundarys) {
 
 		List<TransactionEntity> transactionsList = new ArrayList<>();
-		
+
 		for (BankAccountBoundary bankAccountBoundary : bankAccountBoundarys) {
 			utils.assertNull(bankAccountBoundary);
 			utils.assertNull(bankAccountBoundary.getAccountId());
@@ -186,6 +192,117 @@ public class TransactionJpa implements TransactionService {
 		}
 
 		return transactionsList.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
+	}
+
+	@Override
+	public String[] getYearPrediction(String userId, List<String> categoryList) {
+
+		// Check if user exists
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if (users.isEmpty()) {
+			throw new NotFoundException("Could not find user: " + userId);
+		}
+		
+		
+		Float[] prediction = new Float[12];
+		Arrays.fill(prediction, 0.0f);
+
+		for (String categoryId : categoryList) {
+			// Check if the category exists
+			List<CategoryEntity> category = this.categoryDao.findAllByCategoryId(categoryId);
+			if (category.isEmpty()) {
+				throw new ConflictException("Category doesn't exist " + category);
+			}
+
+			List<TransactionEntity> transactions = transactionDao.findAllByUserIdAndCategoryId(userId, categoryId);
+			if (transactions.isEmpty()) {
+				throw new NotFoundException("Transactions for this category don't exist " + category);
+			}
+			prediction = yearPrediction(transactions, prediction);
+		}
+		
+		return Arrays.stream(prediction).map(String::valueOf).toArray(String[]::new);	
+	}
+
+	public Map<String, Float[]> convertByYears(List<TransactionEntity> transactionsList) {
+		Map<String, Float[]> yearSummery = new HashMap<>();
+
+		if (transactionsList != null) {
+			for (TransactionEntity transaction : transactionsList) {
+				String month = getMonthFromDate(transaction.getDate());
+				String year = getYearFromDate(transaction.getDate());
+
+				Float[] amountsByMonths;
+				
+				if (yearSummery.containsKey(year)) {
+					amountsByMonths = yearSummery.get(year);
+					if (amountsByMonths == null)
+						return null;
+					amountsByMonths[Integer.parseInt(month)] += Float.parseFloat(transaction.getAmount());
+				} else {
+					amountsByMonths = new Float[12];
+					Arrays.fill(amountsByMonths, 0.0f);
+					amountsByMonths[Integer.parseInt(month)] = Float.parseFloat(transaction.getAmount());
+				}
+				yearSummery.put(year, amountsByMonths);
+			}
+			return yearSummery;
+		}
+		return null;
+	}
+
+	public Float[] yearPrediction(List<TransactionEntity> transactionsList, Float[] prediction) {
+		Map<String, Float[]> yearSummery = convertByYears(transactionsList);
+
+		Float[] monthValues = new Float[12];
+		Float[] countedYears = new Float[12];
+		Arrays.fill(monthValues, 0.0f);
+		Arrays.fill(countedYears, 0.0f);
+
+		for (Map.Entry<String, Float[]> year : yearSummery.entrySet()) {
+			int i = 0;
+			for (Float month : year.getValue()) {
+				monthValues[i] += month;
+				if (month > 0) {
+					countedYears[i]++;
+				}
+				i++;
+			}
+		}
+
+		for (int i = 0; i < monthValues.length; i++) {
+			if (countedYears[i] != 0) {
+				prediction[i] += monthValues[i] / countedYears[i];
+			}
+		}
+		return prediction;
+	}
+	
+
+	public static String getMonthFromDate(String date) {
+		Date date1;
+		try {
+			date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date1);
+			return calendar.get(Calendar.MONTH) + "";
+		} catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	public static String getYearFromDate(String date) {
+		Date date1;
+		try {
+			date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date1);
+			return calendar.get(Calendar.YEAR) + "";
+		} catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 
 }

@@ -13,4 +13,7 @@ public interface TransactionService {
 	public List<TransactionBoundary> getTransactionsByUserIdAndDateAfter(String userId, String date);
 	
 	public List<TransactionBoundary> getAllTransactionsFromBankApi(List<BankAccountBoundary> bankAccountBoundary);
+	
+	public String[] getYearPrediction(String userId, List<String> categoryId);
+	
 }

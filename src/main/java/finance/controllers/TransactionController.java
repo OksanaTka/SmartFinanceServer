@@ -52,4 +52,12 @@ public class TransactionController {
 		return transactionService.getAllTransactionsFromBankApi(bankAccountBoundary)
 				.toArray(new TransactionBoundary[0]);
 	}
+	
+	@RequestMapping(path = "/transaction/prediction/{userId}/{categoryId}", 
+			method = RequestMethod.GET, 
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public String[] getPrediction(@PathVariable("userId") String userId,
+			@PathVariable("categoryId") List<String> categoryId) {
+		return transactionService.getYearPrediction(userId, categoryId);
+	}
 }
