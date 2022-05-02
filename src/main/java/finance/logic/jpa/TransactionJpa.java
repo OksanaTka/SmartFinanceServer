@@ -215,10 +215,9 @@ public class TransactionJpa implements TransactionService {
 			}
 
 			List<TransactionEntity> transactions = transactionDao.findAllByUserIdAndCategoryId(userId, categoryId);
-			if (transactions.isEmpty()) {
-				throw new NotFoundException("Transactions for this category don't exist " + category);
+			if (!transactions.isEmpty()) {
+				prediction = yearPrediction(transactions, prediction);
 			}
-			prediction = yearPrediction(transactions, prediction);
 		}
 		
 		return Arrays.stream(prediction).map(String::valueOf).toArray(String[]::new);	
