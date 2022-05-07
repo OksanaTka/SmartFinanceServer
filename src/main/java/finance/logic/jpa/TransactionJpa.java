@@ -1,10 +1,7 @@
 package finance.logic.jpa;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -216,41 +213,14 @@ public class TransactionJpa implements TransactionService {
 
 			List<TransactionEntity> transactions = transactionDao.findAllByUserIdAndCategoryId(userId, categoryId);
 			if (!transactions.isEmpty()) {
-				prediction = yearPrediction(transactions, prediction);
+				prediction = calculateAverage(transactions, prediction);
 			}
 		}
 		
 		return Arrays.stream(prediction).map(String::valueOf).toArray(String[]::new);	
 	}
-
-	public Map<String, Float[]> convertByYears(List<TransactionEntity> transactionsList) {
-		Map<String, Float[]> yearSummery = new HashMap<>();
-
-		if (transactionsList != null) {
-			for (TransactionEntity transaction : transactionsList) {
-				String month = getMonthFromDate(transaction.getDate());
-				String year = getYearFromDate(transaction.getDate());
-
-				Float[] amountsByMonths;
-				
-				if (yearSummery.containsKey(year)) {
-					amountsByMonths = yearSummery.get(year);
-					if (amountsByMonths == null)
-						return null;
-					amountsByMonths[Integer.parseInt(month)] += Float.parseFloat(transaction.getAmount());
-				} else {
-					amountsByMonths = new Float[12];
-					Arrays.fill(amountsByMonths, 0.0f);
-					amountsByMonths[Integer.parseInt(month)] = Float.parseFloat(transaction.getAmount());
-				}
-				yearSummery.put(year, amountsByMonths);
-			}
-			return yearSummery;
-		}
-		return null;
-	}
-
-	public Float[] yearPrediction(List<TransactionEntity> transactionsList, Float[] prediction) {
+	
+	public Float[] calculateAverage(List<TransactionEntity> transactionsList, Float[] prediction) {
 		Map<String, Float[]> yearSummery = convertByYears(transactionsList);
 
 		Float[] monthValues = new Float[12];
@@ -276,32 +246,31 @@ public class TransactionJpa implements TransactionService {
 		}
 		return prediction;
 	}
-	
 
-	public static String getMonthFromDate(String date) {
-		Date date1;
-		try {
-			date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(date1);
-			return calendar.get(Calendar.MONTH) + "";
-		} catch (java.text.ParseException e) {
-			e.printStackTrace();
+	public Map<String, Float[]> convertByYears(List<TransactionEntity> transactionsList) {
+		Map<String, Float[]> yearSummery = new HashMap<>();
+
+		if (transactionsList != null) {
+			for (TransactionEntity transaction : transactionsList) {
+				String month = utils.getMonthFromDate(transaction.getDate());
+				String year = utils.getYearFromDate(transaction.getDate());
+
+				Float[] amountsByMonths;
+				
+				if (yearSummery.containsKey(year)) {
+					amountsByMonths = yearSummery.get(year);
+					if (amountsByMonths == null)
+						return null;
+					amountsByMonths[Integer.parseInt(month)] += Float.parseFloat(transaction.getAmount());
+				} else {
+					amountsByMonths = new Float[12];
+					Arrays.fill(amountsByMonths, 0.0f);
+					amountsByMonths[Integer.parseInt(month)] = Float.parseFloat(transaction.getAmount());
+				}
+				yearSummery.put(year, amountsByMonths);
+			}
+			return yearSummery;
 		}
-		return "";
+		return null;
 	}
-
-	public static String getYearFromDate(String date) {
-		Date date1;
-		try {
-			date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(date1);
-			return calendar.get(Calendar.YEAR) + "";
-		} catch (java.text.ParseException e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
-
 }
