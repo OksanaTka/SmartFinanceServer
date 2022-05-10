@@ -140,13 +140,9 @@ public class TransactionJpa implements TransactionService {
 		for (BankAccountBoundary bankAccountBoundary : bankAccountBoundarys) {
 			utils.assertNull(bankAccountBoundary);
 			utils.assertNull(bankAccountBoundary.getAccountId());
-			System.err.println(bankAccountBoundary.getAccountId());
 			utils.assertNull(bankAccountBoundary.getBankId());
-			System.err.println(bankAccountBoundary.getBankId());
 			utils.assertNull(bankAccountBoundary.getBankBranch());
-			System.err.println(bankAccountBoundary.getBankBranch());
 			utils.assertNull(bankAccountBoundary.getBankAccountNumber());
-			System.err.println(bankAccountBoundary.getBankAccountNumber());
 			String bankId = bankAccountBoundary.getBankId();
 			String bankBranch = bankAccountBoundary.getBankBranch();
 			String bankAccountNum = bankAccountBoundary.getBankAccountNumber();
