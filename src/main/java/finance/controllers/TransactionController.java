@@ -47,6 +47,14 @@ public class TransactionController {
 				.toArray(new TransactionBoundary[0]);
 	}
 	
+	@RequestMapping(path = "/transaction/getAll/monthly/{userId}/{startDate}/{endDate}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public TransactionBoundary[] getTransactionsByUserIdAndDateBetween(@PathVariable("userId") String userId,
+			@PathVariable("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  String startDate,
+			@PathVariable("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  String endDate) {
+		return transactionService.getTransactionsByUserIdAndDateBetween(userId,startDate,endDate)
+				.toArray(new TransactionBoundary[0]);
+	}
+	
 	@RequestMapping(path = "/transaction/getAll/bankApi", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
 	public TransactionBoundary[] getAllTransactionsFromBankApi(@RequestBody List<BankAccountBoundary> bankAccountBoundary) {
 		return transactionService.getAllTransactionsFromBankApi(bankAccountBoundary)
