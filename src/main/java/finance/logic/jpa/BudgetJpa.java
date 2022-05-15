@@ -122,7 +122,8 @@ public class BudgetJpa implements BudgetService {
 
 		// check if transactions sum is valid
 		if (sumTransactions > maxAmount) {
-			throw new ForbiddenException("Transactions sum: "+sumTransactions+" is greater than Budget max amount: "+maxAmount);
+			throw new ForbiddenException(
+					"Transactions sum: " + sumTransactions + " is greater than Budget max amount: " + maxAmount);
 		} else {
 			// add transaction sum to budget
 			String sum = String.valueOf(sumTransactions);
@@ -130,17 +131,19 @@ public class BudgetJpa implements BudgetService {
 		}
 
 		float totalSalaryAmount = getSalaryPrediction(budgetBoundary);
-		
+
 		// get all budgets
-		List<BudgetEntity> allBudgets = this.budgetDao.findAllByUserIdAndStartDateBetween(userId, startDate, finishDate);
-		
-		//calc total budget max amount include current budget
+		List<BudgetEntity> allBudgets = this.budgetDao.findAllByUserIdAndStartDateBetween(userId, startDate,
+				finishDate);
+
+		// calc total budget max amount include current budget
 		float totalBudgetsAmount = Float.parseFloat(budgetBoundary.getMaxAmount());
 		if (!allBudgets.isEmpty()) {
 			totalBudgetsAmount += sumAllBudgetsAmount(allBudgets);
 		}
 		if (totalBudgetsAmount > totalSalaryAmount) {
-			throw new UnsupportedExecption("Total budgets max amount: "+totalBudgetsAmount+" is greater than total salary amount prediction: "+totalSalaryAmount);
+			throw new UnsupportedExecption("Total budgets max amount: " + totalBudgetsAmount
+					+ " is greater than total salary amount prediction: " + totalSalaryAmount);
 		}
 
 		BudgetEntity entity = this.entityConverter.fromBoundary(budgetBoundary);
@@ -197,7 +200,7 @@ public class BudgetJpa implements BudgetService {
 	@Override
 	public List<BudgetBoundary> getAllBudgets(String userId) {
 		utils.assertNull(userId);
-		
+
 		List<UserEntity> users = this.userDao.findAllById(userId);
 		if (!users.isEmpty()) {
 			UserEntity entity = users.get(0);
@@ -234,6 +237,31 @@ public class BudgetJpa implements BudgetService {
 		} else {
 			throw new NotFoundException("There is no budget with this id: " + budgetId);
 		}
+	}
+
+	@Override
+	public void updateBudgetCurrentValue(String userId, String categoryId, String currentAmount,String date) {
+		utils.assertNull(userId);
+		utils.assertNull(categoryId);
+		utils.assertNull(currentAmount);
+		utils.assertNull(date);
+
+		// Check if user exists
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if (users.isEmpty()) {
+			throw new NotFoundException("Could not find user: " + userId);
+		}
+
+		// Check if budget exist
+		List<BudgetEntity> budget = this.budgetDao.findAllByUserIdAndCategoryIdAndStartDateLessThanEqualAndFinishDateGreaterThanEqual(userId, categoryId,date,date);
+		if (!budget.isEmpty()) {
+			
+			float oldAmount = Float.parseFloat(budget.get(0).getCurrentAmount());
+			float newAmount = oldAmount + Float.parseFloat(currentAmount);
+			budget.get(0).setCurrentAmount(String.valueOf(newAmount));
+			this.budgetDao.save(budget.get(0));
+		}
+		
 	}
 
 }

@@ -13,11 +13,17 @@ public interface BudgetDao extends PagingAndSortingRepository<BudgetEntity,Strin
 	public List<BudgetEntity> findAllByUserId(
 			@Param("userId") String userId);
 	
+	public List<BudgetEntity> findAllByUserIdAndBudgetId(
+			@Param("userId") String userId,@Param("budgetId") String budgetId);
+	
 	public List<BudgetEntity> findAllByBudgetId(
 			@Param("budgetId") String budgetId);
 	
 	public List<BudgetEntity> findAllByUserIdAndCategoryId(
 			@Param("userId") String userId, @Param("categoryId") String categoryId);
+	
+	public List<BudgetEntity> findAllByUserIdAndCategoryIdAndStartDateLessThanEqualAndFinishDateGreaterThanEqual(
+			@Param("userId") String userId, @Param("categoryId") String categoryId,@Param("startDate") String startDate,@Param("endDate") String endDate);
 	
 	public List<BudgetEntity> findAllByUserIdAndStartDateBetween(
 			@Param("userId") String userId,

@@ -17,6 +17,7 @@ import finance.data.CategoryEntity;
 import finance.data.TransactionEntity;
 import finance.data.UserEntity;
 import finance.data.dao.BankTransactionsDetailsDao;
+import finance.data.dao.BudgetDao;
 import finance.data.dao.CategoryDao;
 import finance.data.dao.TransactionDao;
 import finance.data.dao.UserDao;
@@ -33,6 +34,7 @@ public class TransactionJpa implements TransactionService {
 	private TransactionDao transactionDao;
 	private UserDao userDao;
 	private CategoryDao categoryDao;
+	private BudgetJpa budgetJpa;
 	private Utils utils;
 	private EntityConverter<TransactionEntity, TransactionBoundary> entityConverter;
 
@@ -47,6 +49,11 @@ public class TransactionJpa implements TransactionService {
 	@Autowired
 	public void setTransactionDao(TransactionDao transactionDao) {
 		this.transactionDao = transactionDao;
+	}
+
+	@Autowired
+	public void setBudgetJpa(BudgetJpa budgetJpa) {
+		this.budgetJpa = budgetJpa;
 	}
 
 	@Autowired
@@ -178,6 +185,10 @@ public class TransactionJpa implements TransactionService {
 					entity.setCategoryId(bankTransactionsDetailsEntity.getCategoryId());
 					entity.setDate(bankTransactionsDetailsEntity.getDate());
 					entity.setUserId(bankAccountBoundary.getUserId());
+
+					// updateBudget
+					budgetJpa.updateBudgetCurrentValue(entity.getUserId(), entity.getCategoryId(), entity.getAmount(),
+							bankTransactionsDetailsEntity.getDate());
 					entity = this.transactionDao.save(entity);
 					transactionsList.add(entity);
 				}
@@ -195,8 +206,7 @@ public class TransactionJpa implements TransactionService {
 		if (users.isEmpty()) {
 			throw new NotFoundException("Could not find user: " + userId);
 		}
-		
-		
+
 		Float[] prediction = new Float[12];
 		Arrays.fill(prediction, 0.0f);
 
@@ -212,10 +222,10 @@ public class TransactionJpa implements TransactionService {
 				prediction = calculateAverage(transactions, prediction);
 			}
 		}
-		
-		return Arrays.stream(prediction).map(String::valueOf).toArray(String[]::new);	
+
+		return Arrays.stream(prediction).map(String::valueOf).toArray(String[]::new);
 	}
-	
+
 	public Float[] calculateAverage(List<TransactionEntity> transactionsList, Float[] prediction) {
 		Map<String, Float[]> yearSummery = convertByYears(transactionsList);
 
@@ -252,7 +262,7 @@ public class TransactionJpa implements TransactionService {
 				String year = utils.getYearFromDate(transaction.getDate());
 
 				Float[] amountsByMonths;
-				
+
 				if (yearSummery.containsKey(year)) {
 					amountsByMonths = yearSummery.get(year);
 					if (amountsByMonths == null)
@@ -268,5 +278,28 @@ public class TransactionJpa implements TransactionService {
 			return yearSummery;
 		}
 		return null;
+	}
+
+	@Override
+	public List<TransactionBoundary> getTransactionsByUserIdAndDateBetween(String userId, String startDate,
+			String endDate) {
+		utils.assertNull(userId);
+		utils.assertNull(startDate);
+		utils.assertNull(endDate);
+
+		// Check if user exists
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if (users.isEmpty()) {
+			throw new NotFoundException("Could not find user: " + userId);
+		}
+
+		List<TransactionEntity> transactions = this.transactionDao.findAllByUserIdAndAndDateBetween(userId, startDate, endDate);
+
+		if (!transactions.isEmpty()) {
+			return transactions.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
+		} else {
+			throw new NotFoundException(
+					"Could not find transactions for user : " + userId + " and startDate: " + startDate +" end date: "+endDate);
+		}
 	}
 }

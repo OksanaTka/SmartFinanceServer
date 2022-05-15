@@ -27,6 +27,12 @@ public interface TransactionDao extends PagingAndSortingRepository<TransactionEn
 			 @Param("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String startDate,
 			 @Param("endtDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String endtDate);
 	
+	
+	public List<TransactionEntity> findAllByUserIdAndAndDateBetween(
+			@Param("userId") String userId,
+			 @Param("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String startDate,
+			 @Param("endtDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String endtDate);
+	
 	public List<TransactionEntity> findAllByUserIdAndDateAfterOrderByDate(
 			@Param("userId") String userId,
 			 @Param("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) String date);

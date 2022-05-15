@@ -11,6 +11,7 @@ public class BudgetEntityConverterImplementation implements EntityConverter<Budg
 	@Override
 	public BudgetBoundary toBoundary(BudgetEntity entity) {
 		BudgetBoundary boundary = new BudgetBoundary();
+		boundary.setBudgetId(entity.getBudgetId());
 		boundary.setCategoryId(entity.getCategoryId());
 		boundary.setCurrentAmount(entity.getCurrentAmount());
 		boundary.setFinishDate(entity.getFinishDate());
