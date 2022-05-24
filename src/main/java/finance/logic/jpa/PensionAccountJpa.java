@@ -107,8 +107,10 @@ public class PensionAccountJpa implements PensionAccountService {
 		if (!pensionAccounts.isEmpty()) {
 			throw new ConflictException("Account already exists: " + pensionAccounts.get(0).getPensionId());
 		}
+		
 
 		PensionAccountEntity entity = this.entityConverter.fromDetails(pensionDetailsEntity);
+		entity.setUserId(pensionAccount.getUserId());
 		entity = this.pensionDao.save(entity);
 		return this.entityConverter.toBoundary(entity);
 	}

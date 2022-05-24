@@ -13,7 +13,6 @@ public class PensionDetailsConverterImplementation implements EntityConverter<Pe
 		PensionDetailsBoundary boundary = new PensionDetailsBoundary();
 		boundary.setPensionDetailsId(entity.getPensionDetailsId());
 		boundary.setFundId(entity.getFundId());
-		boundary.setUserId(entity.getUserId());
 		boundary.setEmployerDeposit(entity.getEmployerDeposit());
 		boundary.setWorkerDeposit(entity.getWorkerDeposit());
 		boundary.setCompensation(entity.getCompensation());
@@ -29,7 +28,6 @@ public class PensionDetailsConverterImplementation implements EntityConverter<Pe
 	public PensionDetailsEntity fromBoundary(PensionDetailsBoundary boundary) {
 		PensionDetailsEntity entity = new PensionDetailsEntity();
 		entity.setFundId(boundary.getFundId());
-		entity.setUserId(boundary.getUserId());
 		entity.setEmployerDeposit(boundary.getEmployerDeposit());
 		entity.setWorkerDeposit(boundary.getWorkerDeposit());
 		entity.setCompensation(boundary.getCompensation());

@@ -39,7 +39,6 @@ public class PensionAccountEntityConverterImplementation implements ExtendedEnti
 	public PensionAccountEntity fromDetails(PensionDetailsEntity pensionDetailsEntity) {
 		PensionAccountEntity entity = new PensionAccountEntity();
 		entity.setFundId(pensionDetailsEntity.getFundId());
-		entity.setUserId(pensionDetailsEntity.getUserId());
 		entity.setEmployerDeposit(pensionDetailsEntity.getEmployerDeposit());
 		entity.setWorkerDeposit(pensionDetailsEntity.getWorkerDeposit());
 		entity.setCompensation(pensionDetailsEntity.getCompensation());
