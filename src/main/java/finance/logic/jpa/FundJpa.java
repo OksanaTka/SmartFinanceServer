@@ -1,5 +1,6 @@
 package finance.logic.jpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,24 +46,28 @@ public class FundJpa implements FundService{
 
 	@Override
 	@Transactional
-	public FundBoundary createFund(FundBoundary fund) {
-		utils.assertNull(fund);
-		utils.assertNull(fund.getFundId());
-		utils.assertNull(fund.getFundName());
-		utils.assertNull(fund.getFundIcon());
+	public List<FundBoundary> createFund(List<FundBoundary> fund) {
 		
-		List<FundEntity> funds = this.fundDao.findAllByFundId(fund.getFundId());
-		
-		if(!funds.isEmpty()) {
-			throw new ConflictException("Fund already exists " + fund.getFundId());
+		List<FundEntity> entityList = new ArrayList<>();
+		for (FundBoundary fundBoundary : fund) {
+			utils.assertNull(fundBoundary);
+			utils.assertNull(fundBoundary.getFundId());
+			utils.assertNull(fundBoundary.getFundName());
+			utils.assertNull(fundBoundary.getFundIcon());
+			
+			List<FundEntity> funds = this.fundDao.findAllByFundId(fundBoundary.getFundId());
+			
+			if(!funds.isEmpty()) {
+				throw new ConflictException("Fund already exists " + fundBoundary.getFundId());
+			}
+			
+			FundEntity entity = this.entityConverter.fromBoundary(fundBoundary);
+			entity.setFundName(fundBoundary.getFundName().toLowerCase());
+			entity.setFundIcon(fundBoundary.getFundIcon());
+			entity = this.fundDao.save(entity);
+			entityList.add(entity);
 		}
-		
-		FundEntity entity = this.entityConverter.fromBoundary(fund);
-		entity.setFundName(fund.getFundName().toLowerCase());
-		entity.setFundIcon(fund.getFundIcon());
-		
-		entity = this.fundDao.save(entity);
-		return this.entityConverter.toBoundary(entity);
+		return entityList.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
 	}
 
 	@Override

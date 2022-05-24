@@ -6,7 +6,7 @@ import finance.boundaries.BankBoundary;
 
 public interface BankService {
 
-	public BankBoundary createBank(BankBoundary bank);
+	public List<BankBoundary> createBank(List<BankBoundary> banks);
 
 	public List<BankBoundary> getAllBanks(int page, int size);
 

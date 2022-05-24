@@ -1,5 +1,7 @@
 package finance.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +28,7 @@ public class CategoryController {
 			method = RequestMethod.POST,
 			produces = MediaType.APPLICATION_JSON_VALUE, 
 			consumes = MediaType.APPLICATION_JSON_VALUE)
-	public CategoryBoundary createCategory(@RequestBody CategoryBoundary category) {
+	public List<CategoryBoundary> createCategory(@RequestBody List<CategoryBoundary> category) {
 		return categoryService.createCategory(category);
 	}
 	

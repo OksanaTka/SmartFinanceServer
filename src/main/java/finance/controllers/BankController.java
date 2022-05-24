@@ -1,5 +1,8 @@
 package finance.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,12 +27,16 @@ public class BankController {
 	}
 
 	@RequestMapping(path = "/bank", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public BankBoundary createBank(@RequestBody NewBankDetails details) {
-		BankBoundary bank = new BankBoundary();
-		bank.setBankId(details.getBankId());
-		bank.setBankName(details.getBankName());
-		bank.setBankIcon(details.getBankIcon());
-		return bankService.createBank(bank);
+	public List<BankBoundary> createBank(@RequestBody List<NewBankDetails> details) {
+		List<BankBoundary> boundaries = new ArrayList<>();
+		for (NewBankDetails newBankDetails : details) {
+			BankBoundary bank = new BankBoundary();
+			bank.setBankId(newBankDetails.getBankId());
+			bank.setBankName(newBankDetails.getBankName());
+			bank.setBankIcon(newBankDetails.getBankIcon());
+			boundaries.add(bank);
+		}
+		return bankService.createBank(boundaries);
 	}
 
 	@RequestMapping(path = "/bank/getAll", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,5 +1,6 @@
 package finance.logic.jpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,26 +45,29 @@ public class CategoryJpa implements CategoryService {
 
 	@Override
 	@Transactional
-	public CategoryBoundary createCategory(CategoryBoundary category) {
-		utils.assertNull(category);
-		utils.assertNull(category.getCategoryId());
-		utils.assertNull(category.getCategoryName());
-		utils.assertNull(category.getCategoryNameHeb());
-		utils.assertNull(category.getCategoryIcon());
+	public List<CategoryBoundary> createCategory(List<CategoryBoundary> category) {
+		List<CategoryEntity> entityList = new ArrayList<>();
+		for (CategoryBoundary categoryBoundary : category) {
+			utils.assertNull(categoryBoundary);
+			utils.assertNull(categoryBoundary.getCategoryId());
+			utils.assertNull(categoryBoundary.getCategoryName());
+			utils.assertNull(categoryBoundary.getCategoryNameHeb());
+			utils.assertNull(categoryBoundary.getCategoryIcon());
 
-		List<CategoryEntity> categories = this.categoryDao.findAllByCategoryId(category.getCategoryId());
-		if (!categories.isEmpty()) {
-			throw new ConflictException("Category already exists " + category.getCategoryId());
+			List<CategoryEntity> categories = this.categoryDao.findAllByCategoryId(categoryBoundary.getCategoryId());
+			if (!categories.isEmpty()) {
+				throw new ConflictException("Category already exists " + categoryBoundary.getCategoryId());
+			}
+
+			CategoryEntity entity = this.entityConverter.fromBoundary(categoryBoundary);
+			entity.setCategoryId(categoryBoundary.getCategoryId());
+			entity.setCategoryName(categoryBoundary.getCategoryName());
+			entity.setCategoryNameHeb(categoryBoundary.getCategoryNameHeb());
+			entity.setCategoryIcon(categoryBoundary.getCategoryIcon());
+			entity = this.categoryDao.save(entity);
+			entityList.add(entity);
 		}
-
-		CategoryEntity entity = this.entityConverter.fromBoundary(category);
-		entity.setCategoryId(category.getCategoryId());
-		entity.setCategoryName(category.getCategoryName());
-		entity.setCategoryNameHeb(category.getCategoryNameHeb());
-		entity.setCategoryIcon(category.getCategoryIcon());
-
-		entity = this.categoryDao.save(entity);
-		return this.entityConverter.toBoundary(entity);
+		return entityList.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
 	}
 
 	@Override

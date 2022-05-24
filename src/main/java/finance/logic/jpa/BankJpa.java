@@ -1,5 +1,6 @@
 package finance.logic.jpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,25 +46,29 @@ public class BankJpa implements BankService {
 
 	@Override
 	@Transactional
-	public BankBoundary createBank(BankBoundary bank) {
-		utils.assertNull(bank);
-		utils.assertNull(bank.getBankId());
-		utils.assertNull(bank.getBankName());
-		utils.assertNull(bank.getBankIcon());
+	public List<BankBoundary> createBank(List<BankBoundary> banks) {
 		
-		List<BankEntity> banks = this.bankDao.findAllByBankId(bank.getBankId());
-		
-		if(!banks.isEmpty()) {
-			throw new ConflictException("Bank already exists " + bank.getBankId());
+		List<BankEntity> entityList = new ArrayList<>();
+		for (BankBoundary bankBoundary : banks) {
+			utils.assertNull(bankBoundary);
+			utils.assertNull(bankBoundary.getBankId());
+			utils.assertNull(bankBoundary.getBankName());
+			utils.assertNull(bankBoundary.getBankIcon());
+			
+			List<BankEntity> entityBanks = this.bankDao.findAllByBankId(bankBoundary.getBankId());
+			
+			if(!entityBanks.isEmpty()) {
+				throw new ConflictException("Bank already exists " + bankBoundary.getBankId());
+			}
+
+			BankEntity entity = this.entityConverter.fromBoundary(bankBoundary);
+			entity.setBankId(bankBoundary.getBankId());
+			entity.setBankName(bankBoundary.getBankName());
+			entity.setBankIcon(bankBoundary.getBankIcon());
+			entity = this.bankDao.save(entity);
+			entityList.add(entity);
 		}
-
-		BankEntity entity = this.entityConverter.fromBoundary(bank);
-		entity.setBankId(bank.getBankId());
-		entity.setBankName(bank.getBankName());
-		entity.setBankIcon(bank.getBankIcon());
-
-		entity = this.bankDao.save(entity);
-		return this.entityConverter.toBoundary(entity);
+		return entityList.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
 	}
 
 	@Override
