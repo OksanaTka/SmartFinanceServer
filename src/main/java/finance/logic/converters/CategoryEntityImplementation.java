@@ -13,7 +13,6 @@ public class CategoryEntityImplementation implements EntityConverter<CategoryEnt
 		CategoryBoundary boundary = new CategoryBoundary();
 		boundary.setCategoryId(entity.getCategoryId());
 		boundary.setCategoryName(entity.getCategoryName());
-		boundary.setCategoryNameHeb(entity.getCategoryNameHeb());
 		boundary.setCategoryIcon(entity.getCategoryIcon());
 		return boundary;
 	}
@@ -22,7 +21,6 @@ public class CategoryEntityImplementation implements EntityConverter<CategoryEnt
 	public CategoryEntity fromBoundary(CategoryBoundary boundary) {
 		CategoryEntity entity = new CategoryEntity();
 		entity.setCategoryName(boundary.getCategoryName());
-		entity.setCategoryNameHeb(boundary.getCategoryNameHeb());
 		entity.setCategoryId(boundary.getCategoryId());
 		entity.setCategoryIcon(boundary.getCategoryIcon());
 		return entity;

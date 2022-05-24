@@ -51,7 +51,6 @@ public class CategoryJpa implements CategoryService {
 			utils.assertNull(categoryBoundary);
 			utils.assertNull(categoryBoundary.getCategoryId());
 			utils.assertNull(categoryBoundary.getCategoryName());
-			utils.assertNull(categoryBoundary.getCategoryNameHeb());
 			utils.assertNull(categoryBoundary.getCategoryIcon());
 
 			List<CategoryEntity> categories = this.categoryDao.findAllByCategoryId(categoryBoundary.getCategoryId());
@@ -62,7 +61,6 @@ public class CategoryJpa implements CategoryService {
 			CategoryEntity entity = this.entityConverter.fromBoundary(categoryBoundary);
 			entity.setCategoryId(categoryBoundary.getCategoryId());
 			entity.setCategoryName(categoryBoundary.getCategoryName());
-			entity.setCategoryNameHeb(categoryBoundary.getCategoryNameHeb());
 			entity.setCategoryIcon(categoryBoundary.getCategoryIcon());
 			entity = this.categoryDao.save(entity);
 			entityList.add(entity);

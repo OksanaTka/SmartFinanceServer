@@ -3,7 +3,6 @@ package finance.boundaries;
 public class CategoryBoundary {
 	private String categoryId;
 	private String categoryName;
-	private String categoryNameHeb;
 	private String categoryIcon;
 	
 	public CategoryBoundary() {
@@ -20,12 +19,6 @@ public class CategoryBoundary {
 	}
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
-	}
-	public String getCategoryNameHeb() {
-		return categoryNameHeb;
-	}
-	public void setCategoryNameHeb(String categoryNameHeb) {
-		this.categoryNameHeb = categoryNameHeb;
 	}
 	public String getCategoryIcon() {
 		return categoryIcon;
