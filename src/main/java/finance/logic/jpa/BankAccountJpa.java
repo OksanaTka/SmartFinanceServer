@@ -68,6 +68,10 @@ public class BankAccountJpa implements BankAccountService {
 		this.bankAccountDetailsDao = bankAccountDetailsDao;
 	}
 
+	/**
+	 * Create new bank account from external Bank Database 
+	 * @return new BankAccountBoundary
+	 */
 	@Override
 	@Transactional
 	public BankAccountBoundary createBankAccount(BankAccountBoundary bankAccount) {
@@ -83,7 +87,7 @@ public class BankAccountJpa implements BankAccountService {
 			throw new UnsupportedExecption("Bank isnt supported " + bankAccount.getBankId());
 		}
 
-		// Connect with Bank and get details
+		// Connect with external Bank Database and get bank details
 		List<BankAccountDetailsEntity> bankAccountDetails = this.bankAccountDetailsDao
 				.findAllByBankIdAndAccountCodeAndAccountPassword(bankAccount.getBankId(), bankAccount.getAccountCode(),
 						bankAccount.getAccountPassword());
@@ -114,6 +118,7 @@ public class BankAccountJpa implements BankAccountService {
 		return this.entityConverter.toBoundary(entity);
 	}
 
+	
 	@Override
 	public BankAccountBoundary getSpecificBankAccount(String bankAccountId) {
 		utils.assertNull(bankAccountId);
@@ -168,6 +173,9 @@ public class BankAccountJpa implements BankAccountService {
 
 	}
 
+	/**
+	 * Get current bank balance from external Bank Database 
+	 */
 	@Override
 	public void updateBalance(List<BankAccountBoundary> bankAccountBoundarys) {
 		for (BankAccountBoundary bankAccountBoundary : bankAccountBoundarys) {
@@ -176,7 +184,7 @@ public class BankAccountJpa implements BankAccountService {
 			utils.assertNull(bankAccountBoundary.getAccountCode());
 			utils.assertNull(bankAccountBoundary.getAccountPassword());
 
-			// Connect with Bank and get balance
+			// Connect with external Bank Database and get balance
 			List<BankAccountDetailsEntity> bankAccountDetails = this.bankAccountDetailsDao
 					.findAllByBankIdAndAccountCodeAndAccountPassword(bankAccountBoundary.getBankId(),
 							bankAccountBoundary.getAccountCode(), bankAccountBoundary.getAccountPassword());

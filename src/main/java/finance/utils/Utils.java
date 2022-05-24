@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Utils {
+	
+	public static String salary = "9";
 
 	/**
 	 * checks if Object is not null

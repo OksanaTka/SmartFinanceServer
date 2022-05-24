@@ -1,9 +1,11 @@
 package finance.logic;
 
+import java.util.List;
+
 import finance.boundaries.BankTransactionsDetailsBoundary;
 
 public interface BankTransactionsDetailsService {
 	
-	public BankTransactionsDetailsBoundary createBankTransactionsDetails(BankTransactionsDetailsBoundary bankTransactionsDetails);
+	public List<BankTransactionsDetailsBoundary> createBankTransactionsDetails(List<BankTransactionsDetailsBoundary> bankTransactionsDetails);
 
 }

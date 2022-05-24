@@ -10,7 +10,7 @@ public interface UserService {
 
 	public UserBoundary login(String userEmail,String password);
 	
-	public UserBoundary loginGmail(String userEmail,String password);
+	public UserBoundary loginGmail(UserBoundary user);
 
 	public void updateUser(String userEmail, UserBoundary update);
 	

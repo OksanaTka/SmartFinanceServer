@@ -1,9 +1,11 @@
 package finance.logic;
 
+import java.util.List;
+
 import finance.boundaries.PensionDetailsBoundary;
 
 public interface PensionDetailsService {
 	
-	public PensionDetailsBoundary createPensionDetails(PensionDetailsBoundary pensionDetailsBoundary);
+	public List<PensionDetailsBoundary> createPensionDetails(List<PensionDetailsBoundary> pensionDetailsBoundary);
 
 }

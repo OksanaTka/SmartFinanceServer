@@ -17,7 +17,6 @@ import finance.data.CategoryEntity;
 import finance.data.TransactionEntity;
 import finance.data.UserEntity;
 import finance.data.dao.BankTransactionsDetailsDao;
-import finance.data.dao.BudgetDao;
 import finance.data.dao.CategoryDao;
 import finance.data.dao.TransactionDao;
 import finance.data.dao.UserDao;
@@ -87,6 +86,9 @@ public class TransactionJpa implements TransactionService {
 		return this.entityConverter.toBoundary(entity);
 	}
 
+	/**
+	 * Get all the users transactions by Category after specified date
+	 */
 	@Override
 	public List<TransactionBoundary> getTransactionsByUserIdAndCategoryAndDateAfter(String userId,
 			List<String> categoryId, String date) {
@@ -117,7 +119,37 @@ public class TransactionJpa implements TransactionService {
 					"Could not find transactions for user : " + userId + " and categories" + categoryId.toString());
 		}
 	}
+	
 
+	/**
+	 * Get all the users transactions by Category between two specified dates
+	 */
+	@Override
+	public List<TransactionBoundary> getTransactionsByUserIdAndDateBetween(String userId, String startDate,
+			String endDate) {
+		utils.assertNull(userId);
+		utils.assertNull(startDate);
+		utils.assertNull(endDate);
+
+		// Check if user exists
+		List<UserEntity> users = this.userDao.findAllById(userId);
+		if (users.isEmpty()) {
+			throw new NotFoundException("Could not find user: " + userId);
+		}
+
+		List<TransactionEntity> transactions = this.transactionDao.findAllByUserIdAndAndDateBetween(userId, startDate, endDate);
+
+		if (!transactions.isEmpty()) {
+			return transactions.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
+		} else {
+			throw new NotFoundException(
+					"Could not find transactions for user : " + userId + " and startDate: " + startDate +" end date: "+endDate);
+		}
+	}
+
+	/**
+	 * Get all the users transactions after specified date
+	 */
 	@Override
 	public List<TransactionBoundary> getTransactionsByUserIdAndDateAfter(String userId, String date) {
 		utils.assertNull(userId);
@@ -139,6 +171,9 @@ public class TransactionJpa implements TransactionService {
 		}
 	}
 
+	/**
+	 * Get all the users transactions from external Bank Database 
+	 */
 	@Override
 	public List<TransactionBoundary> getAllTransactionsFromBankApi(List<BankAccountBoundary> bankAccountBoundarys) {
 
@@ -194,10 +229,12 @@ public class TransactionJpa implements TransactionService {
 				}
 			}
 		}
-
 		return transactionsList.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
 	}
 
+	/**
+	 * Calculate prediction of specified categories 
+	 */
 	@Override
 	public String[] getYearPrediction(String userId, List<String> categoryList) {
 
@@ -217,15 +254,21 @@ public class TransactionJpa implements TransactionService {
 				throw new ConflictException("Category doesn't exist " + category);
 			}
 
+			//Get all transactions by category and calculate prediction
 			List<TransactionEntity> transactions = transactionDao.findAllByUserIdAndCategoryId(userId, categoryId);
 			if (!transactions.isEmpty()) {
 				prediction = calculateAverage(transactions, prediction);
 			}
 		}
-
 		return Arrays.stream(prediction).map(String::valueOf).toArray(String[]::new);
 	}
 
+	/**
+	 * Go through all transactions and calculate average by month 
+	 * @param transactionsList
+	 * @param prediction
+	 * @return Prediction for one category
+	 */
 	public Float[] calculateAverage(List<TransactionEntity> transactionsList, Float[] prediction) {
 		Map<String, Float[]> yearSummery = convertByYears(transactionsList);
 
@@ -253,6 +296,11 @@ public class TransactionJpa implements TransactionService {
 		return prediction;
 	}
 
+	/**
+	 * Convert transactions to map where the key is the year and the value is transactions amount by months
+	 * @param transactionsList
+	 * @return 
+	 */
 	public Map<String, Float[]> convertByYears(List<TransactionEntity> transactionsList) {
 		Map<String, Float[]> yearSummery = new HashMap<>();
 
@@ -278,28 +326,5 @@ public class TransactionJpa implements TransactionService {
 			return yearSummery;
 		}
 		return null;
-	}
-
-	@Override
-	public List<TransactionBoundary> getTransactionsByUserIdAndDateBetween(String userId, String startDate,
-			String endDate) {
-		utils.assertNull(userId);
-		utils.assertNull(startDate);
-		utils.assertNull(endDate);
-
-		// Check if user exists
-		List<UserEntity> users = this.userDao.findAllById(userId);
-		if (users.isEmpty()) {
-			throw new NotFoundException("Could not find user: " + userId);
-		}
-
-		List<TransactionEntity> transactions = this.transactionDao.findAllByUserIdAndAndDateBetween(userId, startDate, endDate);
-
-		if (!transactions.isEmpty()) {
-			return transactions.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
-		} else {
-			throw new NotFoundException(
-					"Could not find transactions for user : " + userId + " and startDate: " + startDate +" end date: "+endDate);
-		}
 	}
 }

@@ -1,6 +1,8 @@
 package finance.logic.jpa;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,25 +42,30 @@ public class PensionDetailsJpa implements PensionDetailsService{
 	}
 
 	@Override
-	public PensionDetailsBoundary createPensionDetails(PensionDetailsBoundary pensionDetailsBoundary) {
-		utils.assertNull(pensionDetailsBoundary);
-		utils.assertNull(pensionDetailsBoundary.getFundId());
-		utils.assertNull(pensionDetailsBoundary.getCode());
-		utils.assertNull(pensionDetailsBoundary.getPhone());
-		utils.assertNull(pensionDetailsBoundary.getIdentityNumber());
+	public List<PensionDetailsBoundary> createPensionDetails(List<PensionDetailsBoundary> pensionDetailsBoundary) {
 		
-		//check if PensionAccountDetails already exists
-		List<PensionDetailsEntity> pensionDetails = this.pensionDetailsDao
-				.findAllByFundIdAndIdentityNumber(pensionDetailsBoundary.getFundId(),
-						pensionDetailsBoundary.getIdentityNumber());
-		
-		if (!pensionDetails.isEmpty()) {
-			throw new UnsupportedExecption("Pension Details already exists");
+		List<PensionDetailsEntity> listEntity = new ArrayList<>();
+		for (PensionDetailsBoundary boundary : pensionDetailsBoundary) {
+			utils.assertNull(boundary);
+			utils.assertNull(boundary.getFundId());
+			utils.assertNull(boundary.getCode());
+			utils.assertNull(boundary.getPhone());
+			utils.assertNull(boundary.getIdentityNumber());
+			
+			//check if PensionAccountDetails already exists
+			List<PensionDetailsEntity> pensionDetails = this.pensionDetailsDao
+					.findAllByFundIdAndIdentityNumber(boundary.getFundId(),
+							boundary.getIdentityNumber());
+			
+			if (!pensionDetails.isEmpty()) {
+				throw new UnsupportedExecption("Pension Details already exists");
+			}
+			
+			PensionDetailsEntity entity = this.entityConverter.fromBoundary(boundary);
+			entity = this.pensionDetailsDao.save(entity);
+			listEntity.add(entity);
 		}
-		
-		PensionDetailsEntity entity = this.entityConverter.fromBoundary(pensionDetailsBoundary);
-		entity = this.pensionDetailsDao.save(entity);
-		return this.entityConverter.toBoundary(entity);
+		return listEntity.stream().map(this.entityConverter::toBoundary).collect(Collectors.toList());
 	}
 
 }

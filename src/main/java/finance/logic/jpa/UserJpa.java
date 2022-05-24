@@ -91,26 +91,25 @@ public class UserJpa implements UserService {
 
 	@Override
 	@Transactional
-	public UserBoundary loginGmail(String userEmail, String password) {
-		utils.assertNull(userEmail);
-		utils.assertValidEmail(userEmail);
-		utils.assertNull(password);
+	public UserBoundary loginGmail(UserBoundary user) {
+		utils.assertNull(user.getEmail());
+		utils.assertValidEmail(user.getEmail());
+		utils.assertNull(user.getPassword());
+		utils.assertNull(user.getFirstName());
+		utils.assertNull(user.getLastName());
 
 		//Get the user from DB
-		List<UserEntity> users = this.userDao.findAllByEmail(userEmail);
+		List<UserEntity> users = this.userDao.findAllByEmail(user.getEmail());
 
 		if (!users.isEmpty()) {
 			UserEntity entity = users.get(0);
-			if (entity.getPassword().equals(password)) {
+			if (entity.getPassword().equals(user.getPassword())) {
 				return this.entityConverter.toBoundary(entity);
 			} else {
-				throw new UnauthorizedException("password incorrect: " + password);
+				throw new UnauthorizedException("password incorrect: " + user.getPassword());
 			}
 		} else {
-			//If user logged in the first time - Create new user
-			UserBoundary user = new UserBoundary();
-			user.setPassword(password);
-			user.setEmail(userEmail.toLowerCase());
+			//If user logged-in for the first time - Create new user
 			return createUser(user);
 		}
 	}

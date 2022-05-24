@@ -1,5 +1,7 @@
 package finance.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,8 +30,8 @@ public class PensionDetailsController {
 			method = RequestMethod.POST, 
 			produces = MediaType.APPLICATION_JSON_VALUE, 
 			consumes = MediaType.APPLICATION_JSON_VALUE)
-	public PensionDetailsBoundary createPensionDetails(
-			@RequestBody PensionDetailsBoundary pensionDetailsBoundary) {
+	public List<PensionDetailsBoundary> createPensionDetails(
+			@RequestBody List<PensionDetailsBoundary> pensionDetailsBoundary) {
 		return pensionDetailsService.createPensionDetails(pensionDetailsBoundary);
 	}
 	

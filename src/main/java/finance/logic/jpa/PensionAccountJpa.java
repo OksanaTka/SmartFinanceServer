@@ -69,6 +69,9 @@ public class PensionAccountJpa implements PensionAccountService {
 		this.entityConverter = entityConverter;
 	}
 
+	/**
+	 * Create new pension account from external Pension Database 
+	 */
 	@Override
 	@Transactional
 	public PensionAccountBoundary createPensionAccount(NewPensionAccountDetails pensionAccount) {
@@ -88,11 +91,11 @@ public class PensionAccountJpa implements PensionAccountService {
 		// Connect to pension API and get details
 		List<PensionDetailsEntity> pensionDetails = this.pensionDetailsDao
 				.findAllByFundIdAndIdentityNumber(pensionAccount.getFundId(), pensionAccount.getIdentityNumber());
-
 		if (pensionDetails.isEmpty()) {
 			throw new NotFoundException("Account doesn't exist");
 		}
 
+		//Check if the user code is correct
 		PensionDetailsEntity pensionDetailsEntity = pensionDetails.get(0);
 		if (!pensionDetailsEntity.getCode().equals(pensionAccount.getCode())) {
 			throw new UnauthorizedException("Account code is incorrect ");
@@ -109,29 +112,32 @@ public class PensionAccountJpa implements PensionAccountService {
 		entity = this.pensionDao.save(entity);
 		return this.entityConverter.toBoundary(entity);
 	}
-
+	
+	
+	/**
+	 * Update Pensions details from external Pension Database 
+	 */
 	@Override
 	@Transactional
 	public PensionAccountBoundary updatePensionAccount(String userId, String fundId) {
 		utils.assertNull(userId);
 		utils.assertNull(fundId);
 
-		// Get user from DB
+		// Check if user exists
 		List<UserEntity> users = this.userDao.findAllById(userId);
 		if (users.isEmpty()) {
 			throw new NotFoundException("User doesn't exist");
 		}
 		UserEntity user = users.get(0);
 
-		// Connect to pension API
+		// Connect to external Pension Database 
 		List<PensionDetailsEntity> pensionDetails = this.pensionDetailsDao.findAllByFundIdAndIdentityNumber(fundId,
 				user.getIdentity_number());
-
 		if (pensionDetails.isEmpty()) {
 			throw new NotFoundException("Account doesn't exist");
 		}
-
 		PensionDetailsEntity updatedDetails = pensionDetails.get(0);
+		
 		// Get pension account from DB and update
 		List<PensionAccountEntity> pensionAccounts = this.pensionDao.findAllByFundIdAndUserId(fundId, userId);
 		if (pensionAccounts.isEmpty()) {

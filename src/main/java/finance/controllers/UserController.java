@@ -42,9 +42,9 @@ public class UserController {
 		return userService.login(email.toLowerCase(), password);
 	}
 
-	@RequestMapping(path = "/user/login/gmail/{userEmail}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public UserBoundary loginGmail(@PathVariable("userEmail") String email, @PathVariable("password") String password) {
-		return userService.loginGmail(email.toLowerCase(), password);
+	@RequestMapping(path = "/user/login/gmail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public UserBoundary loginGmail(@RequestBody UserBoundary user) {
+		return userService.loginGmail(user);
 	}
 
 	@RequestMapping(path = "/user/{userId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -1,7 +1,5 @@
 package finance.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,12 +21,12 @@ public class BudgetController {
 	}
 
 	@RequestMapping(path = "/budget", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public BudgetBoundary createBankAccount(@RequestBody BudgetBoundary budgetBoundary) {
+	public BudgetBoundary createBudget(@RequestBody BudgetBoundary budgetBoundary) {
 		return budgetService.createBudget(budgetBoundary);
 	}
 
 	@RequestMapping(path = "/budget/getAll/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public BudgetBoundary[] getAllBankAccounts(@PathVariable("userId") String userId) {
+	public BudgetBoundary[] getAllBudgets(@PathVariable("userId") String userId) {
 		return budgetService.getAllBudgets(userId).toArray(new BudgetBoundary[0]);
 	}
 
