@@ -12,7 +12,6 @@ public class CategoryEntity {
 	private String categoryId;
 	
 	private String categoryName;
-	private String categoryNameHeb;
 	private String categoryIcon;
 	
 	public CategoryEntity() {
@@ -33,14 +32,6 @@ public class CategoryEntity {
 
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
-	}
-
-	public String getCategoryNameHeb() {
-		return categoryNameHeb;
-	}
-
-	public void setCategoryNameHeb(String categoryNameHeb) {
-		this.categoryNameHeb = categoryNameHeb;
 	}
 
 	public String getCategoryIcon() {
