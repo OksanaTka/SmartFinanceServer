@@ -4,13 +4,11 @@ public class PensionDetailsBoundary {
 	
 	private String pensionDetailsId;
 	private String fundId;
-	private String userId;
 	private String employerDeposit;
 	private String workerDeposit;
 	private String compensation;
 	private String totalAmount;
 	private String managementFee;
-	
 	private String identityNumber;
 	private String phone;
 	private String code;
@@ -33,14 +31,6 @@ public class PensionDetailsBoundary {
 
 	public void setFundId(String fundId) {
 		this.fundId = fundId;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public String getEmployerDeposit() {

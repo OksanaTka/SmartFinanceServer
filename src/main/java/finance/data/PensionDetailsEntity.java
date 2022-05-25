@@ -15,7 +15,7 @@ public class PensionDetailsEntity {
 	@GeneratedValue(generator = "uuid")
 	@GenericGenerator(name = "uuid", strategy = "uuid")
 	private String pensionDetailsId;
-
+	
 	private String fundId;
 	private String employerDeposit;
 	private String workerDeposit;
